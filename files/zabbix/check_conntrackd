@@ -1,8 +1,0 @@
-#/bin/bash
-
-if [ $(/usr/sbin/conntrackd -C /etc/conntrackd/conntrackd.conf -i | wc -l) -lt 1 ] ; then
-        echo "0"
-        exit 0
-fi
-echo "1"
-exit 0

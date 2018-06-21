@@ -1,6 +1,0 @@
-#!/bin/bash
-# Script de Récupération du tag machine
-# Si fichier absent, renvoi null
-# JOT
-
-awk '/^awh_tag:/ { print $2 }' < /etc/facter/facts.d/awh.yaml 2>/dev/null | sed 's|false|NULL|' || echo EMPTY
