@@ -1,0 +1,51 @@
+#!/bin/bash
+
+MYSQL="/usr/bin/mysql --defaults-file=/etc/mysql/debian.cnf --host=localhost --port=3306 --connect_timeout=30"
+
+## Recup options
+
+
+while true ; do
+        if [ ! -z $1 ] ; then
+        case "$1" in
+                --rcrit) REP_RECV_CRIT=$2 ; shift 2;;
+                --rwarn) REP_RECV_WARN=$2 ; shift 2;;
+                --scrit) REP_SEND_CRIT=$2 ; shift 2;;
+                --swarn) REP_SEND_WARN=$2 ; shift 2;;
+                *|-h|--help) echo "Usage $0 --rcrit (Queue recv critical) --rwarn (Queue recv warning) --scrit (Queue send critical) --swarn (Queue send warning)" ; exit 3 ;;
+        esac ; else
+                break ;
+        fi
+done
+
+[[ -z $REP_RECV_CRIT ]] && REP_RECV_CRIT="50"
+[[ -z $REP_RECV_WARN ]] && REP_RECV_WARN="20"
+[[ -z $REP_SEND_CRIT ]] && REP_SEND_CRIT="50"
+[[ -z $REP_SEND_WARN ]] && REP_SEND_WARN="20"
+
+if ( [ `${MYSQL} -Bse"show status like 'wsrep_ready'" 2> /dev/null | awk '{print $2}'` = "ON" ] && \
+        [ `${MYSQL} -Bse"show status like 'wsrep_local_recv_queue'" 2> /dev/null | awk '{print $2}'` -lt $REP_RECV_WARN ] && \
+        [ `${MYSQL} -Bse"show status like 'wsrep_local_send_queue'" 2> /dev/null | awk '{print $2}'` -lt $REP_SEND_WARN ] ) ; then
+        echo "XtraDB Cluster OK" ; exit 0
+else   
+        if [ `${MYSQL} -Bse"show status" | wc -m` -lt 2 ] ; then
+                echo "KO : No mysql connection" ; exit 2
+        fi
+        if [ `${MYSQL} -Bse"show status like 'wsrep_ready'" 2> /dev/null | awk '{print $2}'` != "ON" ] ; then
+                if [ `${MYSQL} -Bse"show status like 'wsrep_local_state_comment'" 2> /dev/null | awk '{print $2}'` = "Synced" ] ; then
+                        echo "XtraDB Cluster KO : Synced but don't accept request" ; exit 2
+                fi
+        fi
+        if [ `${MYSQL} -Bse"show status like 'wsrep_local_recv_queue'" 2> /dev/null | awk '{print $2}'` -gt $REP_RECV_WARN ] ; then
+                if [ `${MYSQL} -Bse"show status like 'wsrep_local_recv_queue'" 2> /dev/null | awk '{print $2}'` -gt $REP_RECV_CRIT ] ; then
+                        echo "XtraDB Cluster KO : Replication delay recv > $REP_RECV_CRIT" ; exit 2
+                fi
+                echo "XtraDB Cluster KO : Replication delay recv > $REP_RECV_WARN" ; exit 1
+        fi
+        if [ `${MYSQL} -Bse"show status like 'wsrep_local_send_queue'" 2> /dev/null | awk '{print $2}'` -gt $REP_SEND_WARN ] ; then
+                if [ `${MYSQL} -Bse"show status like 'wsrep_local_send_queue'" 2> /dev/null | awk '{print $2}'` -gt $REP_SEND_CRIT ] ; then
+                        echo "XtraDB Cluster KO : Replication delay send > $REP_SEND_CRIT" ; exit 2
+                fi
+                echo "XtraDB Cluster KO : Replication delay send > $REP_SEND_WARN" ; exit 1
+        fi
+fi

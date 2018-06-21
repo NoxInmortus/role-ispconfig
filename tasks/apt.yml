@@ -1,0 +1,32 @@
+---
+- name: "Packages | apt-get update"
+  apt:
+    update_cache: yes
+
+- name: "Packages | Upgrade all packages to the latest version"
+  apt:
+    name: "*"
+    state: latest
+
+- name: "Packages | Set Postfix option as internet site"
+  debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
+
+- name: "Packages | Set Postfix option hostname"
+  debconf: name=postifx question="postfix/mailname" value="{{ hostname_fqdn }}" vtype="string"
+
+- name: "Packages | Debconf for phpmyadmin"
+  debconf:
+    name: phpmyadmin
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'phpmyadmin/reconfigure-webserver', value: 'apache2', vtype: 'multiselect' }
+    - { question: 'phpmyadmin/dbconfig-install', value: 'true', vtype: 'boolean' }
+    - { question: 'phpmyadmin/mysql/admin-pass', value: '', vtype: 'password' }
+
+- name: "Packages | Install ISPConfig base packages"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ispconfig_packages }}"

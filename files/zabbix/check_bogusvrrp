@@ -1,0 +1,24 @@
+#!/bin/bash
+# Change By Puppet
+
+log='/var/log/syslog'
+if [ ! -e /var/run/zabbix/check_bogusvrrp.zabbix ] ; then echo 0 > /var/run/zabbix/check_bogusvrrp.zabbix ; fi
+
+cat $log | grep 'Keepalived' > /tmp/check_bogusvrrp.zabbix
+line=$(cat /tmp/check_bogusvrrp.zabbix | wc -l)
+
+firstline=$(cat /var/run/zabbix/check_bogusvrrp.zabbix)
+lastline=$(($line-$firstline))
+if [ $line -lt $firstline ] ; then echo 0 > /var/run/check_bogusvrrp.zabbix ; lastline=$line ; fi
+
+error=$(cat /tmp/check_bogusvrrp.zabbix | tail -n $lastline | grep "bogus VRRP" )
+echo $line > /var/run/zabbix/check_bogusvrrp.zabbix
+rm /tmp/check_bogusvrrp.zabbix
+
+if [ $(echo $error | wc -m) -gt 1 ] ; then
+        echo "0"
+        exit 0
+else
+        echo "1"
+        exit 0
+fi

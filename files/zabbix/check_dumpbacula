@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [[ $( $( which date ) +%k -u --date 2hours ) -lt 11 || $( $( which date ) +%k -u --date 2hours ) -gt 17 ]] ; then
+        echo "OK - No read error in HNO"
+        exit 0
+fi
+if [ ! -e /var/log/dump_bacula.log ] ; then
+        echo "OK - no dump log"
+        exit 0
+fi
+if [ -s /var/log/dump_bacula.log ] ; then
+        echo "error dump please see /var/log/dump_bacula.log"
+        exit 0
+else   
+        echo "OK - no error"
+        exit 0
+fi

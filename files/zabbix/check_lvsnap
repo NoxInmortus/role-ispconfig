@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ -e /sbin/lvs ] ; then 
+	if [ $(/sbin/lvs --separator / | grep "/swi" | wc -m ) -gt 1 ] ; then 
+		echo "LVM Snapshot found(s)"
+	else 
+		echo "OK no LVM Snapshot"
+	fi
+else 
+	echo "OK no LVM"
+fi

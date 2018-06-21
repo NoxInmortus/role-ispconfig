@@ -1,0 +1,47 @@
+#!/bin/bash
+
+Server="NULL"
+IP="NULL"
+
+## Recup options
+
+while true ; do
+        if [ ! -z $1 ] ; then
+        case "$1" in
+                -S|--Server) Server=$2 ; shift 2;;
+                -IP) IP=$2 ; shift 2;;
+                *|-h|--help) echo "Usage $0 [-S|--Server] [-IP]" ; exit 3 ;;
+        esac ; else
+                break ;
+        fi
+done
+
+if [ $(/usr/sbin/mmm_control show | /bin/grep "PASSIVE MODE" | /usr/bin/wc -m) -gt 1 ] ; then
+	echo "KO: Monitor is in PASSIVE MODE" ; exit 0 ;
+fi
+
+if [ ${Server} == "NULL" ] ; then
+        echo "Sever missing" ; exit 0 ;
+fi
+if [ ${IP} == "NULL" ] ; then
+        echo "IP missing" ; exit 0 ;
+fi
+
+if [ ${IP} == "none" ] ; then
+	if [ $(/usr/sbin/mmm_control show | /bin/grep ${Server} | /bin/grep ONLINE | /usr/bin/wc -m) -gt 1 ] ; then
+		echo "OK: ${Server} online" ; exit 0 ;
+	fi
+fi
+if [ ${IP} != "none" ] ; then
+	if [ $(/usr/sbin/mmm_control show | /bin/grep ${Server} | /bin/grep ONLINE  | /bin/grep ${IP} | /usr/bin/wc -m) -gt 1 ] ; then
+        	echo "OK: ${Server} online with IP ${IP}" ; exit 0 ;
+	fi
+	if [ $(/usr/sbin/mmm_control show | /bin/grep ${Server} | /bin/grep ONLINE | /usr/bin/wc -m) -gt 1 ] ; then
+        	echo "KO: ${Server} online but without ${IP}" ; exit 0 ;
+	fi
+fi
+if [ $(/usr/sbin/mmm_control show | /bin/grep ${Server} | /usr/bin/wc -m) -gt 1 ] ; then
+        echo "KO: ${Server} not online" ; exit 0 ;
+fi
+
+echo "KO: mmm_control fail" ; exit 0 ;

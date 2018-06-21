@@ -1,0 +1,17 @@
+#/bin/bash
+
+MAX=$(sysctl net.netfilter.nf_conntrack_max 2> /dev/null | awk '{print $3}')
+CUR=$(sysctl net.netfilter.nf_conntrack_count 2> /dev/null | awk '{print $3}')
+
+if [ -z $MAX ] ; then
+        echo "-1"
+        exit 0
+fi
+
+if [ -z $CUR ] ; then
+        echo "-1"
+        exit 0
+fi
+
+pourc=$(( $CUR * 100 / $MAX ))
+echo $pourc

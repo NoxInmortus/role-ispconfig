@@ -1,0 +1,9 @@
+#!/bin/bash
+## CHANGED BY PUPPET
+
+if [ $(echo "version" | bconsole -u 10 | grep Version: | wc -m ) -gt 1 ]  ; then
+        echo "bacula-dir OK" ; exit 0
+else
+        echo "bacula-dir fail" ; exit 2
+fi
+

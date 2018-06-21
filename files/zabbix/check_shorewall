@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ $(service shorewall status | grep "Shorewall is running" | wc -m ) -gt 1 ] ; then
+	echo "OK : Shorewall is running"
+	exit 0
+fi
+if [ $(service shorewall status | grep "Shorewall is stopped" | wc -m ) -gt 1 ] ; then
+	echo "KO : Shorewall is stopped"
+	exit 0
+fi
+
+echo "OK : Shorewall is old"

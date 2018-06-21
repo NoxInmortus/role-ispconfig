@@ -1,0 +1,125 @@
+#!/bin/bash
+
+awk='/usr/bin/awk'
+date='/bin/date'
+rm='/bin/rm'
+touch='/usr/bin/touch'
+cut='/usr/bin/cut'
+cat='/bin/cat'
+uniq='/usr/bin/uniq'
+sed='/bin/sed'
+tr='/usr/bin/tr'
+tail='/usr/bin/tail'
+dir='/var/bacula/dumpsqlfull'
+
+jobHO=$($date +%F )
+jobHNO=$($date +%F --date "yesterday")
+
+startjobHO=$($date +%s --date "$($date +%F --date "yesterday") 21hours")
+startjobHNO=$($date +%s --date "$($date +%F --date "2 days ago") 21hours")
+
+if [[ $( $( which date ) +%k ) -lt 10 || $( $( which date ) +%k ) -ge 18 ]] ; then
+        echo "dump OK: No read error in HNO"
+        exit 0
+fi
+
+if [ -f /tmp/check_bacula_zabbix-dump.zabbix ] ; then $rm /tmp/check_bacula_zabbix-dump.zabbix ; fi
+$touch /tmp/check_bacula_zabbix-dump.zabbix
+
+if [ $($date +%k) -lt 10 ] ; then
+        jobdate=$jobHNO
+	startjob=$startjobHNO
+else
+        jobdate=$jobHO
+	startjob=$startjobHO
+fi
+
+dump_vide () {
+	if [ $(/usr/bin/du -s $dir/$1/$jobdate.$2 | $awk '{print $1}') -eq 0 ] ; then
+		echo "Dump $2 - $1 vide"  >> /tmp/check_bacula_zabbix-dump.zabbix
+	fi
+}
+
+if [ -d /var/bacula/dedies ] ; then
+for server in $(ls /var/bacula/dedies/*/incr*dump*  | $cut -d'/' -f6| $cut -d'_' -f2-3 | $cut -d'.' -f1 | sort | $uniq ) ; do
+	baculafile=$(ls -tr1 /var/bacula/dedies/$server/incr*dump* | $tail -n 1)
+	if [ $(/usr/bin/stat --printf=%Y $baculafile) -gt $startjob ] ; then
+		if ( [ ! -d $dir/$server/$jobdate.mysql ] && [ ! -d $dir/$server/$jobdate.pgsql ] && [ ! -d $dir/$server/$jobdate.ldap ] && [ ! -d $dir/$server/$jobdate.mongodb ] ) ; then
+			echo "DumpMISS $server" >> /tmp/check_bacula_zabbix-dump.zabbix
+		else
+			if [ -d $dir/$server/$jobdate.mysql ] ; then
+				dump_vide $server mysql
+			fi
+			if [ -d $dir/$server/$jobdate.pgsql ] ; then
+				dump_vide $server pgsql
+			fi
+			if [ -d $dir/$server/$jobdate.ldap ] ; then
+                                dump_vide $server ldap
+                        fi
+			if [ -d $dir/$server/$jobdate.mongodb ] ; then
+				dump_vide $server mongodb
+			fi
+		fi
+	fi
+done
+fi
+
+if [ -d /var/bacula/vservers ] ; then
+for server in $(ls /var/bacula/vservers/*/incr*dump*  | $cut -d'/' -f6| $cut -d'_' -f2-3 | $cut -d'.' -f1 | sort | $uniq ) ; do
+	baculafile=$(ls -tr1 /var/bacula/vservers/$server/incr*dump* | $tail -n 1)
+	if [ $(/usr/bin/stat --printf=%Y $baculafile) -gt $startjob ] ; then
+		if ( [ ! -d $dir/$server/$jobdate.mysql ] && [ ! -d $dir/$server/$jobdate.pgsql ] && [ ! -d $dir/$server/$jobdate.ldap ] && [ ! -d $dir/$server/$jobdate.mongodb ] ) ; then
+	                echo "DumpMISS $server" >> /tmp/check_bacula_zabbix-dump.zabbix
+		else
+                	if [ -d $dir/$server/$jobdate.mysql ] ; then
+	                        dump_vide $server mysql
+	                fi
+	                if [ -d $dir/$server/$jobdate.pgsql ] ; then
+	                        dump_vide $server pgsql
+	                fi
+			if [ -d $dir/$server/$jobdate.ldap ] ; then
+                                dump_vide $server ldap
+                        fi
+			if [ -d $dir/$server/$jobdate.mongodb ] ; then
+                                dump_vide $server mongodb
+                        fi
+	        fi
+	fi
+done
+fi
+
+if [ -d /var/bacula/archis ] ; then
+for server in $(ls /var/bacula/archis/*/incr*dump*  | $cut -d'/' -f6 | $cut -d'.' -f2 | sort | $uniq ) ; do
+	baculafile=$(ls -tr1 /var/bacula/archis/$server/incr*dump* | $tail -n 1)
+	if [ $(/usr/bin/stat --printf=%Y $baculafile) -gt $startjob ] ; then
+		if ( [ ! -d $dir/$server/$jobdate.mysql ] && [ ! -d $dir/$server/$jobdate.pgsql ] && [ ! -d $dir/$server/$jobdate.ldap ] && [ ! -d $dir/$server/$jobdate.mongodb ] ) ; then
+                	echo "DumpMISS $server" >> /tmp/check_bacula_zabbix-dump.zabbix
+		else
+	                if [ -d $dir/$server/$jobdate.mysql ] ; then
+	                        dump_vide $server mysql
+	                fi
+	                if [ -d $dir/$server/$jobdate.pgsql ] ; then
+	                        dump_vide $server pgsql
+	                fi
+			if [ -d $dir/$server/$jobdate.ldap ] ; then
+                                dump_vide $server ldap
+                        fi
+			if [ -d $dir/$server/$jobdate.mongodb ] ; then
+                                dump_vide $server mongodb
+                        fi
+	        fi
+	fi
+done
+fi
+
+if [[ -s /var/log/dumpssh.log ]] ; then
+	$cat /var/log/dumpssh.log >> /tmp/check_bacula_zabbix-dump.zabbix
+fi
+if [[ -s /tmp/check_bacula_zabbix-dump.zabbix ]] ; then
+        $cat /tmp/check_bacula_zabbix-dump.zabbix | $uniq | $tr '\n'  ',' | $sed 's/,/, /g'
+        exit 0
+else
+        echo "dump OK"
+        exit 0
+fi
+

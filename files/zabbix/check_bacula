@@ -1,0 +1,74 @@
+#!/bin/bash
+## CHANGER BY PUPPET
+
+psql='/usr/bin/psql'
+grep='/bin/grep'
+awk='/usr/bin/awk'
+date='/bin/date'
+rm='/bin/rm'
+touch='/usr/bin/touch'
+cut='/usr/bin/cut'
+wc='/usr/bin/wc'
+cat='/bin/cat'
+uniq='/usr/bin/uniq'
+sed='/bin/sed'
+tr='/usr/bin/tr'
+
+
+if [ ! $1 ] ; then
+	DATABASE=$($psql -h localhost -U bacula -l | $grep "bc_" | $awk '{print $1}')
+else 
+	DATABASE=$1
+fi
+
+if [[ $( $( which date ) +%k ) -lt 10 || $( $( which date ) +%k ) -ge 18 ]] ; then
+        echo "backup OK: No read error in HNO" > /tmp/check_bacula.zabbix.result
+        exit 0
+fi
+
+if [ $(echo $DATABASE | wc -m ) -le 1 ] ; then echo "postgres erreur" > /tmp/check_bacula.zabbix.result ; exit 0 ; fi
+
+startjobHO=$($date +%s --date "$($date +%F --date "yesterday") 21hours")
+endjobHO=$($date +%s --date "$($date +%F) 21hours")
+
+startjobHNO=$($date +%s --date "$($date +%F --date "2 days ago") 21hours")
+endjobHNO=$($date +%s --date "$($date +%F --date "yesterday") 21hours")
+
+if [ -f /tmp/check_bacula.zabbix ] ; then $rm /tmp/check_bacula.zabbix ; fi
+$touch /tmp/check_bacula.zabbix
+
+if [ $($date +%k) -lt 10 ] ; then
+	startjob=$startjobHNO
+else
+	startjob=$startjobHO
+fi
+
+for BDD in $DATABASE ; do
+	hostname=$(hostname)
+	if [ $hostname = 'bacdir01' -o $hostname = 'bacdir02' -o $hostname = 'bacdir03' -o $hostname = 'bacdir04' -o $hostname = 'bacdir05' ] ; then
+		client=$(echo $BDD | $cut -d'_' -f3- )
+	else
+		client=$(echo $BDD | $cut -d'_' -f2- )
+	fi
+	for job in $($cat /usr/local/conf/bacula/clients/$client/*.conf | $grep "job_" | $grep -v "^#" | $awk '{print $3}') ; do
+		if [ $($psql -t -h localhost -U bacula $BDD -c "select job from job where job like '$job.%' and jobstatus = 'T' and jobtdate > $startjob ;" | $wc -m ) -le 1 ] ; then
+			base1="base_"
+			base2=$(echo $job | $cut -d'_' -f2-)
+			base=${base1}${base2}
+			if [ $($psql -t -h localhost -U bacula $BDD -c "select job from job where job like '$base.%' and jobstatus = 'T' and jobtdate > $startjob ;" | $wc -m ) -le 1 ] ; then
+				echo "Backup KO sur $client" >> /tmp/check_bacula.zabbix
+			fi
+		fi
+	done
+	for dump in $($cat /usr/local/conf/bacula/clients/$client/*.conf | $grep "= dump_" | $grep -v "^#" | $awk '{print $3}') ; do
+		if [ $($psql -t -h localhost -U bacula $BDD -c "select job from job where job like '$dump.%' and jobstatus = 'T' and jobtdate > $startjob ;" | $wc -m ) -le 1 ] ; then
+			echo "Dumpstart KO sur $client" >> /tmp/check_bacula.zabbix
+		fi
+	done
+done
+
+if [[ -s /tmp/check_bacula.zabbix ]] ; then
+	$cat /tmp/check_bacula.zabbix | $uniq | $tr '\n'  ',' | $sed 's/,/, /g' > /tmp/check_bacula.zabbix.result
+else
+	echo "backup OK" > /tmp/check_bacula.zabbix.result
+fi
