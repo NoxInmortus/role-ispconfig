@@ -1,0 +1,36 @@
+---
+
+- name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf 1/2"
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: 'bind-address           = 127.0.0.1'
+    line: '#bind-address           = 127.0.0.1'
+
+- name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf 2/2"
+  lineinfile:
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    state: present
+    line: 'sql-mode="NO_ENGINE_SUBSTITUTION"'
+
+- name: "MySQL | Set the password authentication method in MariaDB to native"
+  command: echo "update mysql.user set plugin = 'mysql_native_password' where user='root';" | mysql -u root
+
+- name: "MySQL | Configure /etc/mysql/debian.cnf"
+  lineinfile:
+    path: /etc/mysql/debian.cnf
+    regexp: "password ="
+    line: "password = {{ mysql_root_password }}"
+
+- name: "MySQL | Configure /etc/security/limits.conf"
+  lineinfile:
+    path: /etc/security/limits.conf
+    state: present
+    line: "{{ item }}"
+  with_items:
+    - mysql soft nofile 65535
+    - mysql hard nofile 65535
+
+- name: "MySQL | Configure /etc/systemd/system/mysql.service.d/limits.conf"
+  template:
+    src: limits.conf
+    dest: /etc/systemd/system/mysql.service.d/limits.conf

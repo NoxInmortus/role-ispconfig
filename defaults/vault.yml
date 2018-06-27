@@ -1,1 +1,4 @@
 mysql_root_password:
+
+mailman_email:
+mailman_password:

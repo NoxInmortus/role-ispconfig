@@ -1,0 +1,14 @@
+---
+
+- name: "Apache2 | Configure HTTPOXY /etc/apache2/conf-available/httpoxy.conf"
+  lineinfile:
+    path: /etc/apache2/conf-available/httpoxy.conf
+    state: present
+    line: "{{ item }}"
+  with_items:
+    - httpoxy.conf
+
+- apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache2_modules }}"

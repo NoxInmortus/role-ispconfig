@@ -39,7 +39,7 @@ ispconfig_packages:
   - libnet-dns-perl
   - libdbd-mysql-perl
   - postgrey
-  - apache2 
+  - apache2
   - apache2-doc
   - apache2-utils
   - libapache2-mod-php
@@ -71,8 +71,28 @@ ispconfig_packages:
   - php-memcache
   - php-imagick
   - php-gettext
-  - php7.0-zip 
+  - php7.0-zip
   - php7.0-mbstring
   - memcached
   - libapache2-mod-passenger
   - php7.0-soap
+  - certbot
+  - php7.0-fpm
+  - php7.0-opcache
+  - php-apcu
+  - mailman
+
+apache2_modules:
+  - suexec
+  - rewrite
+  - ssl
+  - actions
+  - include
+  - dav_fs
+  - dav
+  - auth_digest
+  - cgi
+  - headers
+  - httpoxy
+  - proxy_fcgi
+  - alias

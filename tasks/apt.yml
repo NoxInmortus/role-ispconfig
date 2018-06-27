@@ -25,6 +25,16 @@
     - { question: 'phpmyadmin/dbconfig-install', value: 'true', vtype: 'boolean' }
     - { question: 'phpmyadmin/mysql/admin-pass', value: '', vtype: 'password' }
 
+- name: "Packages | Debconf for mailman"
+  debconf:
+    name: mailman
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'mailman/used_languages', value: 'en', vtype: 'multiselect' }
+    - { question: 'mailman/create_site_list', value: '', vtype: 'multiselect' }
+
 - name: "Packages | Install ISPConfig base packages"
   apt:
     name: "{{ item }}"
