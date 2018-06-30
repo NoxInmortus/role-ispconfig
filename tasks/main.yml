@@ -1,0 +1,40 @@
+---
+- name: Include host
+  include: host.yml
+  tags:
+    - ispconfig
+
+- name: Include apt
+  include: apt.yml
+  tags:
+    - ispconfig
+
+- name: Include postfix
+  include: postfix.yml
+  tags:
+    - ispconfig
+
+- name: Include mailman
+  include: mailman.yml
+  tags:
+    - ispconfig
+
+- name: Include apache2
+  include: apache2.yml
+  tags:
+    - ispconfig
+
+- name: Include mysql
+  include: mysql.yml
+  tags:
+    - ispconfig
+
+- name: Include mysql-secure
+  include: mysql_secure_installation.yml
+  tags:
+    - ispconfig
+
+- name: Include others
+  include: others.yml
+  tags:
+    - ispconfig
