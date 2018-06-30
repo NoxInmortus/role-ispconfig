@@ -1,9 +1,4 @@
 ---
-- name: Include host
-  include: host.yml
-  tags:
-    - ispconfig
-
 - name: Include apt
   include: apt.yml
   tags:

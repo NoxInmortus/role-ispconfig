@@ -2,11 +2,14 @@
 
 - name: "Mailman | Configure new maillist"
   command: echo {{ mailman_email }} | echo {{ mailman_password }} | newlist mailman
+ when: mailman is defined
 
 - name: "Mailman | Configure /etc/aliases"
   template:
     src: limits.conf
     dest: /etc/security/limits.conf
+ when: mailman is defined
 
 - name: "Mailman | finalize"
   command: newaliases && ln -s /etc/mailman/apache.conf /etc/apache2/conf-enabled/mailman.conf
+ when: mailman is defined
