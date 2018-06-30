@@ -18,6 +18,7 @@
   include: apache2.yml
   tags:
     - ispconfig
+  when: not ansible_check_mode
 
 - name: Include mysql
   include: mysql.yml
@@ -28,6 +29,7 @@
   include: mysql_secure_installation.yml
   tags:
     - ispconfig
+  when: not ansible_check_mode
 
 - name: Include others
   include: others.yml
