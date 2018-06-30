@@ -1,0 +1,11 @@
+galaxy_info:
+  author:
+    - Alban EG
+  min_ansible_version: 2.4
+  platforms:
+    - name: Debian
+      versions:
+        - stretch
+  categories:
+    - common
+dependencies: []
