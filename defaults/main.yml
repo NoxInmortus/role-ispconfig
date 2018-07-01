@@ -81,6 +81,32 @@ ispconfig_packages:
   - php7.0-opcache
   - php-apcu
   - mailman
+  - python-mysqldb
+  - pure-ftpd-common 
+  - pure-ftpd-mysql
+  - quota
+  - quotatool
+  - bind9
+  - dnsutils
+  - haveged
+  - webalizer
+  - awstats
+  - geoip-database
+  - libclass-dbi-mysql-perl
+  - libtimedate-perl
+  - build-essential 
+  - autoconf
+  - automake
+  - libtool
+  - flex
+  - bison
+  - debhelper
+  - binutils
+  - fail2ban
+  - roundcube
+  - roundcube-core
+  - roundcube-mysql
+  - roundcube-plugins
 
 apache2_modules:
   - suexec

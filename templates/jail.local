@@ -1,0 +1,19 @@
+[pure-ftpd]
+enabled = true
+port = ftp
+filter = pure-ftpd
+logpath = /var/log/syslog
+maxretry = 3
+
+[dovecot]
+enabled = true
+filter = dovecot
+logpath = /var/log/mail.log
+maxretry = 5
+
+[postfix-sasl]
+enabled = true
+port = smtp
+filter = postfix-sasl
+logpath = /var/log/mail.log
+maxretry = 3

@@ -35,6 +35,17 @@
     - { question: 'mailman/used_languages', value: 'en', vtype: 'multiselect' }
     - { question: 'mailman/create_site_list', value: '', vtype: 'multiselect' }
 
+- name: "Packages | Debconf for roundcube"
+  debconf:
+    name: phpmyadmin
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'roundcube/dbconfig-install', value: 'true', vtype: 'boolean' }
+    - { question: 'roundcube/password-confirm', value: '', vtype: 'password' }
+    - { question: 'roundcube/mysql/admin-pass', value: '{{ mysql_root_password }}', vtype: 'password' }
+
 - name: "Packages | Install ISPConfig base packages"
   apt:
     name: "{{ item }}"

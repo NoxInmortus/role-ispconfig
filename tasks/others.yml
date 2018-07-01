@@ -14,3 +14,38 @@
     name: spamassassin
     state: stopped
     enabled: no
+
+- name: "Others | Configure AWStats /etc/cron.d/awstats"
+  template:
+    src: awstats
+    dest: /etc/cron.d/awstats
+  when: not ansible_check_mode
+
+- name: "Others | Configure fail2ban /etc/fail2ban/jail.local"
+  template:
+    src: jail.local
+    dest: /etc/fail2ban/jail.local
+  when: not ansible_check_mode
+
+- name: "Others | Configure roundcube /etc/roundcube/config.inc.php 1/2"
+  lineinfile:
+    path: /etc/roundcube/config.inc.php
+    regexp: '^config[\'default_host\']$'
+    line: '\$config[\'default_host\'] = \'localhost\';'
+  when: not ansible_check_mode
+
+- name: "Others | Configure roundcube /etc/roundcube/config.inc.php 2/2"
+  lineinfile:
+    path: /etc/roundcube/config.inc.php
+    regexp: '^config[\'smtp_server\']$'
+    line: '\$config[\'smtp_server\'] = \'localhost\';'
+  when: not ansible_check_mode
+
+- name: "Others | Configure roundcube /etc/apache2/conf-enabled/roundcube.conf"
+  lineinfile:
+    path: /etc/apache2/conf-enabled/roundcube.conf
+    insertbefore:'<Directory /var/lib/roundcube/>'
+    line: 'Alias /webmail /var/lib/roundcube'
+  when: not ansible_check_mode
+
+

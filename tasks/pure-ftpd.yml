@@ -1,0 +1,31 @@
+---
+- name: "PureFTPd | Configure /etc/default/pure-ftpd-common"
+  template:
+    src: pure-ftpd-common
+    dest: /etc/default/pure-ftpd-common
+  when: not ansible_check_mode
+
+- name: "PureFTPd | TLS Activation"
+  command: echo 1 > /etc/pure-ftpd/conf/TLS
+  when: not ansible_check_mode
+
+- name: "PureFTPd | Configure TLS 1/2"
+  file:
+    path: /etc/ssl/private/
+    state: directory
+
+#- name: "PureFTPd | Run TLS role to generate SSL cert"
+#  include_role:
+#    name: tls
+
+#- name: "PureFTPd | chmod 600 /etc/ssl/private/pure-ftpd.pem"
+#  file:
+#    path: /etc/ssl/private/pure-ftpd.pem
+#    mode: 0600
+#  when: not ansible_check_mode
+
+## todo /etc/fstab part ##
+## ,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
+## mount -o remount /
+## quotacheck -avugm
+## quotaon -avug
