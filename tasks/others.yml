@@ -44,7 +44,7 @@
 - name: "Others | Configure roundcube /etc/apache2/conf-enabled/roundcube.conf"
   lineinfile:
     path: /etc/apache2/conf-enabled/roundcube.conf
-    insertbefore:'<Directory /var/lib/roundcube/>'
+    insertbefore: '<Directory /var/lib/roundcube/>'
     line: 'Alias /webmail /var/lib/roundcube'
   when: not ansible_check_mode
 
