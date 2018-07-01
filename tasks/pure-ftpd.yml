@@ -11,7 +11,7 @@
 
 - name: "PureFTPd | Configure TLS 1/2"
   file:
-    path: /etc/ssl/private/
+    path: /etc/ssl/private
     state: directory
 
 #- name: "PureFTPd | Run TLS role to generate SSL cert"

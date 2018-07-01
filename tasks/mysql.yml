@@ -35,6 +35,11 @@
     - mysql hard nofile 65535
   when: not ansible_check_mode
 
+- name: "MySQL | Create directory /etc/systemd/system/mysql.service.d"
+  file:
+    path: /etc/systemd/system/mysql.service.d
+    state: directory
+
 - name: "MySQL | Configure /etc/systemd/system/mysql.service.d/limits.conf"
   template:
     src: limits.conf
