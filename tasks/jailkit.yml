@@ -13,11 +13,19 @@
 - name: "Jailkit | Installing jailkit 1/4"
   command: echo 5 > /tmp/jailkit-2.19/debian/compat
 
-- name: "Jailkit | Installing jailkit 2/4"
-  shell: cd /tmp/jailkit-2.19 && ./debian/rules binary
+- name: "Jailkit | Compile JailKit"
+  shell: "{{ item }} chdir=/tmp/jailkit-2.19"
+  with_items:
+    - ./debian/rules binary
 
 - name: "Jailkit | Installing jailkit 3/4"
   command: dpkg -i /tmp/jailkit_2.19-1_*.deb
 
 - name: "Jailkit | Installing jailkit 4/4"
   command: rm /tmp/jailkit_2.19*
+
+
+
+
+
+
