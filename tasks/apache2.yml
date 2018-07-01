@@ -1,12 +1,9 @@
 ---
-
 - name: "Apache2 | Configure HTTPOXY /etc/apache2/conf-available/httpoxy.conf"
-  lineinfile:
-    path: /etc/apache2/conf-available/httpoxy.conf
-    state: present
-    line: "{{ item }}"
-  with_items:
-    - httpoxy.conf
+  template:
+    src: httpoxy.conf
+    dest: /etc/apache2/conf-available/httpoxy.conf
+  when: not ansible_check_mode
 
 - apache2_module:
     name: "{{ item }}"

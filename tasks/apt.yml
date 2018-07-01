@@ -37,7 +37,7 @@
 
 - name: "Packages | Debconf for roundcube"
   debconf:
-    name: phpmyadmin
+    name: roundcube
     question: "{{ item.question }}"
     value: "{{ item.value }}"
     vtype: "{{ item.vtype }}"
