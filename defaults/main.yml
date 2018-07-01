@@ -126,6 +126,7 @@ apache2_modules:
   - headers
   - proxy_fcgi
   - alias
+  - jailkit
 
 apache2_conf:
   - httpoxy

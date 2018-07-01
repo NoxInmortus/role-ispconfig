@@ -1,4 +1,9 @@
 ---
+- name: Include jailkit
+  include: jailkit.yml
+  tags:
+    - ispconfig
+
 - name: Include apt
   include: apt.yml
   tags:
@@ -30,11 +35,6 @@
   tags:
     - ispconfig
   when: not ansible_check_mode
-
-- name: Include jailkit
-  include: jailkit.yml
-  tags:
-    - ispconfig
 
 - name: Include others
   include: others.yml

@@ -1,31 +1,14 @@
 ---
-- name: "Jailkit | Download"
-  get_url:
-    url: http://olivier.sessink.nl/jailkit/jailkit-2.19.tar.gz
-    dest: /tmp/jailkit-2.19.tar.gz
+# https://www.virtualmin.com/node/53969
 
-- name: "Jailkit | Unarchive"
-  unarchive:
-    src: /tmp/jailkit-2.19.tar.gz
-    dest: /tmp/
-    remote_src: yes
+- name: "Jailkit | Installing jailkit repository key"
+  command: wget http://software2.virtualmin.com/lib/RPM-GPG-KEY-virtualmin-6 -O /tmp/RPM-GPG-KEY-virtualmin-6 | apt-key add /tmp/RPM-GPG-KEY-virtualmin-6
 
-- name: "Jailkit | Installing jailkit 1/4"
-  command: echo 5 > /tmp/jailkit-2.19/debian/compat
-
-- name: "Jailkit | Compile JailKit"
-  shell: "{{ item }} chdir=/tmp/jailkit-2.19"
+- name: "Jailkit | Add repository"
+  apt_repository:
+    repo: {{ item }}
+    state: present
   with_items:
-    - ./debian/rules binary
-
-- name: "Jailkit | Installing jailkit 3/4"
-  command: dpkg -i /tmp/jailkit_2.19-1_*.deb
-
-- name: "Jailkit | Installing jailkit 4/4"
-  command: rm /tmp/jailkit_2.19*
-
-
-
-
-
+    - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-xenial main
+    - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-universal main
 
