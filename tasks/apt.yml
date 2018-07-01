@@ -1,13 +1,4 @@
 ---
-- name: "Packages | apt-get update"
-  apt:
-    update_cache: yes
-
-- name: "Packages | Upgrade all packages to the latest version"
-  apt:
-    name: "*"
-    state: latest
-
 - name: "Packages | Set Postfix option as internet site"
   debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
 
