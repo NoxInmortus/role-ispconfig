@@ -3,6 +3,11 @@ ip_smtp: 192.168.10.13
 hostname_fqdn: 'smtp.imperium-gaming.fr'
 hostname: 'smtp'
 
+mysql_root_password: '2Xemax9DdAs014GVt1X0'
+
+mailman_email:
+mailman_password:
+
 ispconfig_packages:
   - postfix
   - postfix-mysql
