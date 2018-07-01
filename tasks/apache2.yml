@@ -5,7 +5,12 @@
     dest: /etc/apache2/conf-available/httpoxy.conf
   when: not ansible_check_mode
 
-- apache2_module:
+- name: "Apache2 | Enable Apache modules"
+  apache2_module:
     name: "{{ item }}"
     state: present
   with_items: "{{ apache2_modules }}"
+
+- name: "Apache2 | Enable Apache conf"
+  command: "a2enconf {{ item }}"
+  with_items: "{{ apache2_conf }}"

@@ -124,6 +124,8 @@ apache2_modules:
   - auth_digest
   - cgi
   - headers
-  - httpoxy
   - proxy_fcgi
   - alias
+
+apache2_conf:
+  - httpoxy
