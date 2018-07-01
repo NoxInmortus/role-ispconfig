@@ -6,7 +6,7 @@
 
 - name: "Jailkit | Add repository"
   apt_repository:
-    repo: {{ item }}
+    repo: "{{ item }}"
     state: present
   with_items:
     - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-xenial main
