@@ -19,6 +19,11 @@
   tags:
     - ispconfig
 
+- name: Include pure-ftpd
+  include: pure-ftpd.yml
+  tags:
+    - ispconfig
+
 - name: Include apache2
   include: apache2.yml
   tags:

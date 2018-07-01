@@ -9,7 +9,7 @@
   command: echo 1 > /etc/pure-ftpd/conf/TLS
   when: not ansible_check_mode
 
-- name: "PureFTPd | Configure TLS 1/2"
+- name: "PureFTPd | Create tls directory"
   file:
     path: /etc/ssl/private
     state: directory
