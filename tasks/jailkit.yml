@@ -1,5 +1,5 @@
 ---
-- name: "Jailkit | Download
+- name: "Jailkit | Download"
   get_url:
     url: http://olivier.sessink.nl/jailkit/jailkit-2.19.tar.gz
     dest: /tmp/jailkit-2.19.tar.gz
