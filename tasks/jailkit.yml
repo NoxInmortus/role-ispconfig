@@ -1,8 +1,13 @@
 ---
 # https://www.virtualmin.com/node/53969
 
-- name: "Jailkit | Installing jailkit repository key"
-  command: wget http://software2.virtualmin.com/lib/RPM-GPG-KEY-virtualmin-6 -O /tmp/RPM-GPG-KEY-virtualmin-6 | apt-key add /tmp/RPM-GPG-KEY-virtualmin-6
+- name: "Jailkit | Download"
+  get_url:
+    url: http://software2.virtualmin.com/lib/RPM-GPG-KEY-virtualmin-6
+    dest: /tmp/RPM-GPG-KEY-virtualmin-6
+
+- name: "Jailkit | Installing jailkit repository key 2/2"
+  command: apt-key add /tmp/RPM-GPG-KEY-virtualmin-6
 
 - name: "Jailkit | Add repository"
   apt_repository:

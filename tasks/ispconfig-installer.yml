@@ -1,3 +1,13 @@
 ---
-- name: "PureFTPd | ISPConfig Installer"
-  shell: cd /tmp && wget http://www.ispconfig.org/downloads/ISPConfig-3-stable.tar.gz && tar xfz ISPConfig-3-stable.tar.gz
+- name: "ISPConfig-Installer | Download"
+  get_url:
+    url: http://www.ispconfig.org/downloads/ISPConfig-3-stable.tar.gz
+    dest: /tmp/ISPConfig-3-stable.tar.gz
+
+jailkit-2.19.tar.gz
+
+- name: "ISPConfig-Installer | Unarchive"
+  unarchive:
+    src: /tmp/ISPConfig-3-stable.tar.gz
+    dest: /tmp/
+    remote_src: yes
