@@ -14,16 +14,6 @@
     path: /etc/ssl/private
     state: directory
 
-#- name: "PureFTPd | Run TLS role to generate SSL cert"
-#  include_role:
-#    name: tls
-
-#- name: "PureFTPd | chmod 600 /etc/ssl/private/pure-ftpd.pem"
-#  file:
-#    path: /etc/ssl/private/pure-ftpd.pem
-#    mode: 0600
-#  when: not ansible_check_mode
-
 - name: "PureFTPd | Configure /etc/fstab"
   lineinfile:
     path: /etc/fstab

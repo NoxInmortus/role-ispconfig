@@ -1,0 +1,88 @@
+---
+- name: "ISPConfig-SSL | Check if let's encrypt SSL for ISPConfig exist"
+  stat:
+    path: /etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem
+  register: le_ssl
+
+- name: "ISPConfig-SSL | Backup old certificate"
+  shell: cd /usr/local/ispconfig/interface/ssl/ && mv ispserver.crt ispserver.crt-$(date +"%y%m%d%H%M%S").bak && mv ispserver.key ispserver.key-$(date +"%y%m%d%H%M%S").bak && mv ispserver.pem ispserver.pem-$(date +"%y%m%d%H%M%S").bak
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to ispconfig location 1/2"
+  file:
+    src: '/etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem'
+    dest: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
+    state: link
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to ispconfig location 2/2"
+  file:
+    src: '/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem'
+    dest: '/usr/local/ispconfig/interface/ssl/ispserver.key'
+    state: link
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Assemble ispserver.pem 1/2"
+  assemble:
+    src: /usr/local/ispconfig/interface/ssl/ispserver.crt
+    dest: /usr/local/ispconfig/interface/ssl/ispserver.pem
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Assemble ispserver.pem 2/2"
+  assemble:
+    src: /usr/local/ispconfig/interface/ssl/ispserver.key
+    dest: /usr/local/ispconfig/interface/ssl/ispserver.pem
+  validate: 'apache2 -t'
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | chmod 600 LE SSL"                                                                                                                                                    
+  file:                                                                                                                                                                                                          
+    path: /usr/local/ispconfig/interface/ssl/ispserver.pem
+    mode: 0600                                                                                                                                                                                                   
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Backup old certificate for postfix"
+  shell: cd /etc/postfix/ && mv smtpd.cert smtpd.cert-$(date +"%y%m%d%H%M%S").bak && mv smtpd.key smtpd.key-$(date +"%y%m%d%H%M%S").bak
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to postfix location 1/2"
+  file:
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.key'
+    dest: '/etc/postfix/smtpd.key'
+    state: link
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to postfix location 2/2"
+  file:
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
+    dest: '/etc/postfix/smtpd.cert'
+    state: link
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to pure-ftpd ssl location"
+  file:
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
+    dest: '/etc/ssl/private/pure-ftpd.pem'
+    state: link
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | chmod 600 LE SSL"
+  file:
+    path: /etc/ssl/private/pure-ftpd.pem
+    mode: 0600                                                                                                                                                                                                   
+  when: le_ssl.stat.exists
+
+- name: "ISPConfig-SSL | Setup ssl cert for dovecot 1/2"
+  lineinfile:
+    path: /etc/dovecot/dovecot.conf
+    regexp: 'ssl_cert$'
+    line: 'ssl_cert = </etc/postfix/smtpd.cert'
+
+- name: "ISPConfig-SSL | Setup ssl cert for dovecot 2/2"
+  lineinfile:
+    path: /etc/dovecot/dovecot.conf
+    regexp: 'ssl_key$'
+    line: 'ssl_key = </etc/postfix/smtpd.key'
+
+- name: "ISPConfig-SSL | Setup Incron job"
+  shell: echo "/etc/letsencrypt/archive/$(hostname -f)/ IN_MODIFY ./etc/init.d/le_ispc_pem.sh" >> /var/spool/incron/root

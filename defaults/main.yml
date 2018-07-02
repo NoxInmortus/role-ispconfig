@@ -112,6 +112,7 @@ ispconfig_packages:
   - roundcube-core
   - roundcube-mysql
   - roundcube-plugins
+  - incron
 
 apache2_modules:
   - suexec
