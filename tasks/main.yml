@@ -50,3 +50,8 @@
   include: ispconfig-installer.yml
   tags:
     - ispconfig
+
+- name: Include ispconfig-ssl
+  include: ispconfig-installer.yml
+  tags:
+    - ispconfig-ssl
