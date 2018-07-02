@@ -26,8 +26,10 @@
 
 - name: "PureFTPd | Finalizing 2/3"
   command: quotacheck -avugm
+  ignore_errors: yes
   when: not ansible_check_mode
 
 - name: "PureFTPd | Finalizing 2/3"
   command: quotaon -avug
+  ignore_errors: yes
   when: not ansible_check_mode
