@@ -6,7 +6,7 @@
   when: not ansible_check_mode
 
 - name: "PureFTPd | TLS Activation"
-  command: echo 1 > /etc/pure-ftpd/conf/TLS
+  shell: echo 1 > /etc/pure-ftpd/conf/TLS
   when: not ansible_check_mode
 
 - name: "PureFTPd | Create tls directory"
@@ -14,11 +14,16 @@
     path: /etc/ssl/private
     state: directory
 
+- name:" PureFTPd | Check /etc/fstab"
+  shell: cat /etc/fstab
+  register: fstab_quota
+
 - name: "PureFTPd | Configure /etc/fstab"
   lineinfile:
     path: /etc/fstab
     regexp: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro 0       1'
     line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
+  when: fstab_quota is failed and fstab_quota.stdout.find('quota') !=1
 
 - name: "PureFTPd | Finalizing 1/3"
   command: mount -o remount /
