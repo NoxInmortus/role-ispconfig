@@ -14,7 +14,7 @@
     path: /etc/ssl/private
     state: directory
 
-- name:" PureFTPd | Check /etc/fstab"
+- name: "PureFTPd | Check /etc/fstab"
   shell: cat /etc/fstab
   register: fstab_quota
 
