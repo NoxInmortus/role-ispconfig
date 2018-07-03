@@ -17,6 +17,7 @@
 - name: "PureFTPd | Check /etc/fstab"
   shell: grep -c usrjquota /etc/fstab
   register: fstab_quota
+  failed_when: "'FAILED' in fstab_quota.stderr"
 
 - name: "PureFTPd | Remounting partition"
   mount:

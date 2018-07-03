@@ -39,6 +39,7 @@
 - name: "MySQL Secure | Check /etc/facts.conf for mysql_secure=yes"
   shell: grep -c mysql_secure=yes /etc/facts/conf
   register: facts_mysql_secure
+  failed_when: "'FAILED' in facts_mysql_secure.stderr"
 
 - name: Include mysql-secure
   include: mysql_secure_installation.yml
