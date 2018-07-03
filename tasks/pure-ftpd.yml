@@ -23,18 +23,19 @@
     path: /etc/fstab
     regexp: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro 0       1'
     line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
-  when: fstab_quota is failed and fstab_quota.stdout.find('quota') !=1
+  when: fstab_quota.stdout.find('usrjquota') !=1
 
 - name: "PureFTPd | Finalizing 1/3"
   command: mount -o remount /
-  when: not ansible_check_mode
+  when: not ansible_check_mode and fstab_quota.stdout.find('usrjquota') !=1
 
 - name: "PureFTPd | Finalizing 2/3"
   command: quotacheck -avugm
   ignore_errors: yes
-  when: not ansible_check_mode
+  when: not ansible_check_mode and fstab_quota.stdout.find('usrjquota') !=1
 
 - name: "PureFTPd | Finalizing 2/3"
   command: quotaon -avug
   ignore_errors: yes
-  when: not ansible_check_mode
+  when: not ansible_check_mode and fstab_quota.stdout.find('usrjquota') !=1
+
