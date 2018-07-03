@@ -33,14 +33,14 @@
     src: /dev/mapper/Debian9--Template--vg-root
     state: mounted
     opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
-  when: fstab_quota.stdout == "0" and not ansible_check_mode
+  when: not ansible_check_mode or fstab_quota.stdout == "0"
 
-- name: "PureFTPd | Finalizing 2/3"
+- name: "PureFTPd | Quota Check"
   command: quotacheck -avugm
   ignore_errors: yes
   when: fstab_quota.stdout == "0" and not ansible_check_mode
 
-- name: "PureFTPd | Finalizing 3/3"
+- name: "PureFTPd | Quota On"
   command: quotaon -avug
   ignore_errors: yes
   when: fstab_quota.stdout == "0" and not ansible_check_mode
