@@ -64,13 +64,13 @@
 - name: "ISPConfig Installer | Check if folder already exist"
   stat:
     path: /tmp/ispconfig3_install
-  register: ispconfig_installer
+  register: isp_install_dir
 
 - name: Include ispconfig-installer
   include: ispconfig-installer.yml
   tags:
     - ispconfig
-  when: ispconfig-installer.stat.exists
+  when: isp_install_dir.stat.exists
 
 ## ISPConfig Configuration with Let's Encrypt SSL (after being generated)
 - name: "ISPConfig-SSL | Check if let's encrypt SSL for ISPConfig exist"
