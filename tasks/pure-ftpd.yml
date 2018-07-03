@@ -15,28 +15,29 @@
     state: directory
 
 - name: "PureFTPd | Check /etc/fstab"
-  shell: cat /etc/fstab
+  shell: grep -c usrjquota /etc/fstab
   register: fstab_quota
+  ignore_errors: yes
 
 - name: "PureFTPd | Configure /etc/fstab"
   lineinfile:
     path: /etc/fstab
-    regexp: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro 0       1$'
+    state: present
+    regexp: '^\/dev\/mapper\/Debian9--Template--vg-root'
     line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
-  when: fstab_quota.stdout.find('usrjquota') != -1
-  debug: msg="/etc/fstab already configured for quota."
+  when: fstab_quota.stdout == "0"
 
 - name: "PureFTPd | Finalizing 1/3"
   command: mount -o remount /
-  when: not ansible_check_mode and fstab_quota.stdout.find('usrjquota') !=1
+  when: fstab_quota.stdout == "0" and not ansible_check_mode
 
 - name: "PureFTPd | Finalizing 2/3"
   command: quotacheck -avugm
   ignore_errors: yes
-  when: not ansible_check_mode and fstab_quota.stdout.find('usrjquota') !=1
+  when: fstab_quota.stdout == "0" and not ansible_check_mode
 
-- name: "PureFTPd | Finalizing 2/3"
+- name: "PureFTPd | Finalizing 3/3"
   command: quotaon -avug
   ignore_errors: yes
-  when: not ansible_check_mode and fstab_quota.stdout.find('usrjquota') !=1
+  when: fstab_quota.stdout == "0" and not ansible_check_mode
 
