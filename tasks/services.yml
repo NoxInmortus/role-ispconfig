@@ -1,0 +1,21 @@
+---
+- name: "Restarting Services | Reload Systemd"
+  systemd:
+    state: restarted
+    daemon_reload: yes
+
+- name: "Restarting Services | Postfix"
+  service: name=postfix state=restarted
+
+- name: "Restarting Services | MySQL"
+  service: name=mysql state=restarted
+
+- name: "Restarting Services | Apache2"
+  service: name=apache2 state=restarted
+
+- name: "Restarting Services | PureFTPd"
+  service: name=pure-ftpd-mysql state=restarted
+
+- name: "Restarting Services | Fail2ban"
+  service: name=fail2ban state=restarted
+

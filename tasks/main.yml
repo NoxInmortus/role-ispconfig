@@ -55,3 +55,8 @@
   include: ispconfig-installer.yml
   tags:
     - ispconfig
+
+- name: Include services
+  include: services.yml
+  tags:
+    - ispconfig
