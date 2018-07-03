@@ -17,23 +17,17 @@
 - name: "PureFTPd | Check /etc/fstab"
   shell: grep -c usrjquota /etc/fstab
   register: fstab_quota
-  ignore_errors: yes
-
-#- name: "PureFTPd | Configure /etc/fstab"
-#  lineinfile:
-#    path: /etc/fstab
-#    state: present
-#    regexp: '^\/dev\/mapper\/Debian9--Template--vg-root'
-#    line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
-#  when: fstab_quota.stdout == "0"
 
 - name: "PureFTPd | Remounting partition"
   mount:
     path: /
     src: /dev/mapper/Debian9--Template--vg-root
+    fstype: ext4
     state: mounted
     opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
+    passno: 1
   when: not ansible_check_mode or fstab_quota.stdout == "0"
+  ignore_errors: yes
 
 - name: "PureFTPd | Quota Check"
   command: quotacheck -avugm

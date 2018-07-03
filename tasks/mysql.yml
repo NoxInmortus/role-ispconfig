@@ -5,23 +5,19 @@
     path: /etc/mysql/mariadb.conf.d/50-server.cnf
     regexp: 'bind-address           = 127.0.0.1'
     line: '#bind-address           = 127.0.0.1'
-  when: not ansible_check_mode
 
 - name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf 2/2"
   template:
     src: 50-server.cnf
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-  when: not ansible_check_mode
 
 - name: "MySQL | Set the password authentication method in MariaDB to native"
   shell: echo "update mysql.user set plugin = 'mysql_native_password' where user='root';" | mysql -u root
-  when: not ansible_check_mode
 
 - name: "MySQL | Configure /etc/mysql/debian.cnf"
   template:
     src: debian.cnf
     dest: /etc/mysql/debian.cnf
-  when: not ansible_check_mode
 
 - name: "MySQL | Configure /etc/security/limits.conf"
   lineinfile:
@@ -32,7 +28,6 @@
   with_items:
     - mysql soft nofile 65535
     - mysql hard nofile 65535
-  when: not ansible_check_mode
 
 - name: "MySQL | Create directory /etc/systemd/system/mysql.service.d"
   file:
@@ -43,4 +38,3 @@
   template:
     src: limits.conf
     dest: /etc/systemd/system/mysql.service.d/limits.conf
-  when: not ansible_check_mode

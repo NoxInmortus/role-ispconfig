@@ -1,39 +1,53 @@
 ---
-
-- name: Set root Password
+- name: "MySQL Secure | Set root Password"
   mysql_user: login_password={{ mysql_root_password }} check_implicit_admin=yes name=root host={{ item }} password={{ mysql_root_password }} state=present 
   with_items:
     - localhost
     - 127.0.0.1
     - ::1
 
-- name: Reload privilege tables
+- name: "MySQL Secure | Reload privilege tables"
   command: 'mysql -ne "{{ item }}"'
   with_items:
     - FLUSH PRIVILEGES
   changed_when: False
 
-- name: Remove anonymous users
+- name: "MySQL Secure | Remove anonymous users"
   command: 'mysql -ne "{{ item }}"'
   with_items:
     - DELETE FROM mysql.user WHERE User=''
   changed_when: False
 
-- name: Disallow root login remotely
+- name: "MySQL Secure Disallow root login remotely"
   command: 'mysql -ne "{{ item }}"'
   with_items:
     - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
   changed_when: False
 
-- name: Remove test database and access to it
+- name: "MySQL Secure | Remove test database and access to it"
   command: 'mysql -ne "{{ item }}"'
   with_items:
     - DROP DATABASE IF EXISTS test
     - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
   changed_when: False
 
-- name: Reload privilege tables
+- name: "MySQL Secure | Reload privilege tables"
   command: 'mysql -ne "{{ item }}"'
   with_items:
     - FLUSH PRIVILEGES
   changed_when: False
+
+## Make sure the task does not start twice
+- name: "MySQL Secure | Ensure /etc/facts.conf exist"
+  file:
+    path: /etc/facts.conf
+    state: file
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "MySQL Secure | Add mysql_secure=yes to /etc/facts.conf"
+  lineinfile:
+    path: /etc/facts.conf
+    state: present
+    line: 'mysql_secure=yes'

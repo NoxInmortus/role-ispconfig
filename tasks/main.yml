@@ -34,12 +34,17 @@
   include: mysql.yml
   tags:
     - ispconfig
+  when: not ansible_check_mode
+
+- name: "MySQL Secure | Check /etc/facts.conf for mysql_secure=yes"
+  shell: grep -c mysql_secure=yes /etc/facts/conf
+  register: facts_mysql_secure
 
 - name: Include mysql-secure
   include: mysql_secure_installation.yml
   tags:
     - ispconfig
-  when: not ansible_check_mode
+  when: not ansible_check_mode and facts_mysql_secure == "0"
 
 - name: Include others
   include: others.yml

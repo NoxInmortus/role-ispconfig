@@ -52,4 +52,4 @@
   when: not ansible_check_mode
 
 - name: "Others | Configure Incron"
-  command: echo "root" >> /etc/incron.allow
+  shell: echo "root" >> /etc/incron.allow
