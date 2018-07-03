@@ -1,35 +1,42 @@
 ---
+## JailKit repository
 - name: Include jailkit
   include: jailkit.yml
   tags:
     - ispconfig
 
+## Debconf configurations and package installations
 - name: Include apt
   include: apt.yml
   tags:
     - ispconfig
 
+## Postfix templating
 - name: Include postfix
   include: postfix.yml
   tags:
     - ispconfig
 
+## Mailman templating
 - name: Include mailman
   include: mailman.yml
   tags:
     - ispconfig
 
+## PureFTPd Configuration
 - name: Include pure-ftpd
   include: pure-ftpd.yml
   tags:
     - ispconfig
 
+## Apache2 Configuration
 - name: Include apache2
   include: apache2.yml
   tags:
     - ispconfig
   when: not ansible_check_mode
 
+## MySQL Configuration
 - name: Include mysql
   include: mysql.yml
   tags:
@@ -47,21 +54,37 @@
     - ispconfig
   when: not ansible_check_mode and facts_mysql_secure == "0"
 
+## Various Configurations
 - name: Include others
   include: others.yml
   tags:
     - ispconfig
 
+## ISPConfig Installer Download
+- name: "ISPConfig Installer | Check if folder already exist"
+  stat:
+    path: /tmp/ispconfig3_install
+  register: ispconfig_installer
+
 - name: Include ispconfig-installer
   include: ispconfig-installer.yml
   tags:
     - ispconfig
+  when: ispconfig-installer.stat.exists
+
+## ISPConfig Configuration with Let's Encrypt SSL (after being generated)
+- name: "ISPConfig-SSL | Check if let's encrypt SSL for ISPConfig exist"
+  stat:
+    path: /etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem
+  register: le_ssl
 
 - name: Include ispconfig-ssl
   include: ispconfig-installer.yml
   tags:
     - ispconfig
+  when: le_ssl.stat.exists
 
+## Restarting Services
 - name: Include services
   include: services.yml
   tags:
