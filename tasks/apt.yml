@@ -1,10 +1,13 @@
 ---
-
-- name: "Packages | Set Postfix option as internet site"
-  debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
-
-- name: "Packages | Set Postfix option hostname"
-  debconf: name=postifx question="postfix/mailname" value="{{ hostname_fqdn }}" vtype="string"
+- name: "Packages | Debconf for Postfix"
+  debconf:
+    name: postfix
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'postfix/main_mailer_type', value: 'Internet Site', vtype: 'string' }
+    - { question: 'postfix/mailname', value: '{{ hostname_fqdn }}', vtype: 'string' }
 
 - name: "Packages | Debconf for phpmyadmin"
   debconf:
@@ -41,6 +44,7 @@
 - name: "Packages | apt-get update"
   apt:
     update_cache: yes
+    cache_valid_time: 3600
 
 - name: "Packages | Install ISPConfig base packages"
   apt:

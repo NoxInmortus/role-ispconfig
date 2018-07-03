@@ -1,8 +1,6 @@
 ---
 - name: "Restarting Services | Reload Systemd"
-  systemd:
-    state: restarted
-    daemon_reload: yes
+  systemd: daemon_reload=yes
 
 - name: "Restarting Services | Postfix"
   service: name=postfix state=restarted

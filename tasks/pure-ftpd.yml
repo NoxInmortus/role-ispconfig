@@ -19,17 +19,21 @@
   register: fstab_quota
   ignore_errors: yes
 
-- name: "PureFTPd | Configure /etc/fstab"
-  lineinfile:
-    path: /etc/fstab
-    state: present
-    regexp: '^\/dev\/mapper\/Debian9--Template--vg-root'
-    line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
-  when: fstab_quota.stdout == "0"
+#- name: "PureFTPd | Configure /etc/fstab"
+#  lineinfile:
+#    path: /etc/fstab
+#    state: present
+#    regexp: '^\/dev\/mapper\/Debian9--Template--vg-root'
+#    line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
+#  when: fstab_quota.stdout == "0"
 
-- name: "PureFTPd | Finalizing 1/3"
-  command: mount -o remount /
-  when: fstab_quota.stdout == "0" and not ansible_check_mode
+- name: "PureFTPd | Remounting partition"
+  mount:
+    path: /
+    src: /dev/mapper/Debian9--Template--vg-root
+    state: mounted
+    opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
+  when: fstab_quota.stdout == "0"
 
 - name: "PureFTPd | Finalizing 2/3"
   command: quotacheck -avugm
