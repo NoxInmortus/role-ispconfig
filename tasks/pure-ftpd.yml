@@ -21,9 +21,10 @@
 - name: "PureFTPd | Configure /etc/fstab"
   lineinfile:
     path: /etc/fstab
-    regexp: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro 0       1'
+    regexp: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro 0       1$'
     line: '/dev/mapper/Debian9--Template--vg-root /               ext4    errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0 0       1'
-  when: fstab_quota.stdout.find('usrjquota') !=1
+  when: fstab_quota.stdout.find('usrjquota') != -1
+  debug: msg="/etc/fstab already configured for quota."
 
 - name: "PureFTPd | Finalizing 1/3"
   command: mount -o remount /

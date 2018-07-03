@@ -27,11 +27,11 @@
   lineinfile:
     path: /etc/security/limits.conf
     state: present
+    insertbefore: '# End of file'
     line: "{{ item }}"
   with_items:
     - mysql soft nofile 65535
     - mysql hard nofile 65535
-  insertbefore: '# End of file'
   when: not ansible_check_mode
 
 - name: "MySQL | Create directory /etc/systemd/system/mysql.service.d"
