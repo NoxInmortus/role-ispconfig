@@ -1,11 +1,4 @@
 ---
-
-- name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf 1/2"
-  lineinfile:
-    path: /etc/mysql/mariadb.conf.d/50-server.cnf
-    regexp: 'bind-address           = 127.0.0.1'
-    line: '#bind-address           = 127.0.0.1'
-
 - name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf 2/2"
   template:
     src: 50-server.cnf
@@ -22,8 +15,6 @@
 - name: "MySQL | Configure /etc/security/limits.conf"
   lineinfile:
     path: /etc/security/limits.conf
-    state: present
-    insertbefore: '# End of file'
     line: "{{ item }}"
   with_items:
     - mysql soft nofile 65535
