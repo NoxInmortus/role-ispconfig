@@ -18,11 +18,16 @@
     - ispconfig
 
 ## Mailman templating
+- name: "Mailman | Check /etc/facts.conf for mailman=yes"
+  shell: grep -c mailman=yes /etc/facts/conf
+  register: facts_mailman
+  failed_when: "'FAILED' in facts_mailman.stderr"
+
 - name: Include mailman
   include: mailman.yml
   tags:
     - ispconfig
-  when: mailman_email is defined
+  when: mailman_email is defined and facts_mailman == "0"
 
 ## PureFTPd Configuration
 - name: Include pure-ftpd
