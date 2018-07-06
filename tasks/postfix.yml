@@ -1,5 +1,5 @@
 ---
 - name: "Postfix | Configure /etc/postfix/master.cf"
   template:
-    src: master.cf
+    src: postfix.master.cf
     dest: /etc/postfix/master.cf

@@ -1,7 +1,7 @@
 ---
 - name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf 2/2"
   template:
-    src: 50-server.cnf
+    src: mysql.50-server.cnf
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
 
 - name: "MySQL | Set the password authentication method in MariaDB to native"
@@ -9,7 +9,7 @@
 
 - name: "MySQL | Configure /etc/mysql/debian.cnf"
   template:
-    src: debian.cnf
+    src: mysql.debian.cnf
     dest: /etc/mysql/debian.cnf
 
 - name: "MySQL | Configure /etc/security/limits.conf"
@@ -27,5 +27,5 @@
 
 - name: "MySQL | Configure /etc/systemd/system/mysql.service.d/limits.conf"
   template:
-    src: limits.conf.j2
+    src: mysql.limits.conf
     dest: /etc/systemd/system/mysql.service.d/limits.conf

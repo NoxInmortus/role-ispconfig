@@ -1,7 +1,7 @@
 ---
 - name: "Apache2 | Configure HTTPOXY /etc/apache2/conf-available/httpoxy.conf"
   template:
-    src: httpoxy.conf
+    src: apache2.httpoxy.conf
     dest: /etc/apache2/conf-available/httpoxy.conf
   when: not ansible_check_mode
 

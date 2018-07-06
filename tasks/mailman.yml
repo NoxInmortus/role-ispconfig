@@ -5,7 +5,7 @@
 
 - name: "Mailman | Configure /etc/aliases"
   template:
-    src: aliases
+    src: mailman.aliases
     dest: /etc/aliases
 
 - name: "Mailman | Symlink"

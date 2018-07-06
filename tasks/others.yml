@@ -23,7 +23,7 @@
 
 - name: "Others | Configure fail2ban /etc/fail2ban/jail.local"
   template:
-    src: jail.local
+    src: f2b.jail.local
     dest: /etc/fail2ban/jail.local
   when: not ansible_check_mode
 

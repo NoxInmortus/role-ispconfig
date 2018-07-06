@@ -1,7 +1,7 @@
 ---
 - name: "Roundcube | Configure roundcube /etc/roundcube/config.inc.php"
   template:
-    src: roundcube.inc.php
+    src: roundcube.config.inc.php
     dest: /etc/roundcube/config.inc.php
   when: not ansible_check_mode
 
