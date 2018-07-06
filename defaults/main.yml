@@ -16,34 +16,15 @@ ispconfig_packages:
   - mariadb-server
   - openssl
   - getmail4
-  - rkhunter
   - binutils
   - dovecot-imapd
   - dovecot-pop3d
   - dovecot-mysql
   - dovecot-sieve
   - dovecot-lmtpd
-  - sudo
   - amavisd-new
   - spamassassin
   - zoo
-  - unzip
-  - bzip2
-  - arj
-  - nomarch
-  - lzop
-  - cabextract
-  - apt-listchanges
-  - libnet-ldap-perl
-  - libauthen-sasl-perl
-  - daemon
-  - libio-string-perl
-  - libio-socket-ssl-perl
-  - libnet-ident-perl
-  - zip
-  - libnet-dns-perl
-  - libdbd-mysql-perl
-  - postgrey
   - apache2
   - apache2-doc
   - apache2-utils
@@ -56,14 +37,10 @@ ispconfig_packages:
   - phpmyadmin
   - php7.0-cli
   - php7.0-cgi
-  - libapache2-mod-fcgid
   - apache2-suexec-pristine
-  - php-pear
   - php7.0-mcrypt
   - mcrypt
   - imagemagick
-  - libruby
-  - libapache2-mod-python
   - php7.0-curl
   - php7.0-intl
   - php7.0-pspell
@@ -78,14 +55,11 @@ ispconfig_packages:
   - php-gettext
   - php7.0-zip
   - php7.0-mbstring
-  - memcached
-  - libapache2-mod-passenger
   - php7.0-soap
   - certbot
   - php7.0-fpm
   - php7.0-opcache
   - php-apcu
-  - mailman
   - python-mysqldb
   - pure-ftpd-common 
   - pure-ftpd-mysql
@@ -96,9 +70,43 @@ ispconfig_packages:
   - haveged
   - webalizer
   - awstats
-  - geoip-database
+  - binutils
+  - roundcube
+  - roundcube-core
+  - roundcube-mysql
+  - roundcube-plugins
+
+ispconfig_libraries:
+  - libapache2-mod-fcgid
+  - libapache2-mod-python
+  - libapache2-mod-passenger
+  - libnet-ldap-perl
+  - libauthen-sasl-perl
+  - libio-string-perl
+  - libio-socket-ssl-perl
+  - libnet-ident-perl
+  - libnet-dns-perl
+  - libdbd-mysql-perl
+  - libruby
   - libclass-dbi-mysql-perl
   - libtimedate-perl
+
+others_packages:
+  - rkhunter
+  - sudo
+  - unzip
+  - bzip2
+  - arj
+  - nomarch
+  - lzop
+  - cabextract
+  - apt-listchanges
+  - daemon
+  - zip
+  - postgrey
+  - php-pear
+  - mailman
+  - geoip-database
   - build-essential 
   - autoconf
   - automake
@@ -106,12 +114,7 @@ ispconfig_packages:
   - flex
   - bison
   - debhelper
-  - binutils
   - fail2ban
-  - roundcube
-  - roundcube-core
-  - roundcube-mysql
-  - roundcube-plugins
   - incron
   - jailkit
 

@@ -51,3 +51,15 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ ispconfig_packages }}"
+
+- name: "Packages | Install ISPConfig libraries"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ ispconfig_libraries }}"
+
+- name: "Packages | Install Others packages"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ others_packages }}"
