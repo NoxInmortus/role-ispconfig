@@ -27,29 +27,5 @@
     dest: /etc/fail2ban/jail.local
   when: not ansible_check_mode
 
-- name: "Others | Configure roundcube /etc/roundcube/config.inc.php 1/2"
-  lineinfile:
-    path: /etc/roundcube/config.inc.php
-    regexp: ".config.'default_host'. = '';"
-    line: "$config['default_host'] = 'localhost';"
-    state: present
-  when: not ansible_check_mode
-
-- name: "Others | Configure roundcube /etc/roundcube/config.inc.php 2/2"
-  lineinfile:
-    path: /etc/roundcube/config.inc.php
-    regexp: ".config.'smtp_server'. = '';"
-    line: "$config['smtp_server'] = 'localhost';"
-    state: present
-  when: not ansible_check_mode
-
-- name: "Others | Configure roundcube /etc/apache2/conf-enabled/roundcube.conf"
-  lineinfile:
-    path: /etc/apache2/conf-enabled/roundcube.conf
-    insertbefore: '<Directory /var/lib/roundcube/>'
-    line: 'Alias /webmail /var/lib/roundcube'
-    state: present
-  when: not ansible_check_mode
-
 - name: "Others | Configure Incron"
   shell: echo "root" >> /etc/incron.allow

@@ -60,6 +60,12 @@
     - ispconfig
   when: not ansible_check_mode and facts_mysql_secure == "0"
 
+## Roundcube Configuration
+- name: Include roundcube
+  include: roundcube.yml
+  tags:
+    - ispconfig
+
 ## Various Configurations
 - name: Include others
   include: others.yml
