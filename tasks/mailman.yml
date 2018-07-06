@@ -8,5 +8,11 @@
     src: aliases
     dest: /etc/aliases
 
-- name: "Mailman | finalize"
-  shell: newaliases && ln -s /etc/mailman/apache.conf /etc/apache2/conf-enabled/mailman.conf
+- name: "Mailman | Symlink"
+  file:
+    src: /etc/mailman/apache.conf
+    dest: /etc/apache2/conf-enabled/mailman.conf
+    state: link
+
+- name: "Mailman | newaliases"
+  shell: newaliases
