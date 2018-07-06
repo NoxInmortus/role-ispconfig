@@ -5,8 +5,8 @@
 
 - name: "Mailman | Configure /etc/aliases"
   template:
-    src: limits.conf
-    dest: /etc/security/limits.conf
+    src: aliases
+    dest: /etc/aliases
 
 - name: "Mailman | finalize"
   shell: newaliases && ln -s /etc/mailman/apache.conf /etc/apache2/conf-enabled/mailman.conf
