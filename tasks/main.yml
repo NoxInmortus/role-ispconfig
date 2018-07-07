@@ -28,7 +28,7 @@
 
 ## Mailman templating
 - name: "Mailman | Check /etc/facts.conf for mailman=yes"
-  shell: grep -c mailman=yes /etc/facts/conf
+  shell: grep -c mailman=yes /etc/facts.conf
   register: facts_mailman
   failed_when: "'FAILED' in facts_mailman.stderr"
 
@@ -59,7 +59,7 @@
   when: not ansible_check_mode
 
 - name: "MySQL Secure | Check /etc/facts.conf for mysql_secure=yes"
-  shell: grep -c mysql_secure=yes /etc/facts/conf
+  shell: grep -c mysql_secure=yes /etc/facts.conf
   register: facts_mysql_secure
   failed_when: "'FAILED' in facts_mysql_secure.stderr"
 
