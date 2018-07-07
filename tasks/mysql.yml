@@ -4,9 +4,6 @@
     src: mysql.50-server.cnf
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
 
-- name: "MySQL | Set the password authentication method in MariaDB to native"
-  shell: echo "update mysql.user set plugin = 'mysql_native_password' where user='root';" | mysql -u root
-
 - name: "MySQL | Configure /etc/mysql/debian.cnf"
   template:
     src: mysql.debian.cnf
