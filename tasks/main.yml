@@ -106,11 +106,11 @@
 ## ISPConfig Configuration with Let's Encrypt SSL (after being generated)
 - name: "ISPConfig-SSL | Check if let's encrypt SSL for ISPConfig exist"
   stat:
-    path: /etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem
+    path: /etc/letsencrypt/live/{{ hostname_fqdn }}
   register: le_ssl
 
 - name: Include ispconfig-ssl
-  include: ispconfig-installer.yml
+  include: ispconfig-ssl.yml
   tags:
     - ispconfig
   when: le_ssl.stat.exists

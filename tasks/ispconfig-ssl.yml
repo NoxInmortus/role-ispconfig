@@ -1,29 +1,23 @@
 ---
+# https://www.howtoforge.com/tutorial/securing-ispconfig-3-with-a-free-lets-encrypt-ssl-certificate/
+
 - name: "ISPConfig-SSL | Backup old certificate"
-  shell: cd /usr/local/ispconfig/interface/ssl/ && mv ispserver.crt ispserver.crt-$(date +"%y%m%d%H%M%S").bak && mv ispserver.key ispserver.key-$(date +"%y%m%d%H%M%S").bak && mv ispserver.pem ispserver.pem-$(date +"%y%m%d%H%M%S").bak
+  shell: cd /usr/local/ispconfig/interface/ssl/ && mv ispserver.crt ispserver.crt-$(date +"%y%m%d%H%M%S").bak && mv ispserver.key ispserver.key-$(date +"%y%m%d%H%M%S").bak
 
 - name: "ISPConfig-SSL | Put symlink of the LE SSL to ispconfig location 1/2"
   file:
-    src: '/etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem'
+    src: '/etc/letsencrypt/live/{{ hostname_fqdn }}/fullchain.pem'
     dest: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
     state: link
 
 - name: "ISPConfig-SSL | Put symlink of the LE SSL to ispconfig location 2/2"
   file:
-    src: '/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem'
+    src: '/etc/letsencrypt/live/{{ hostname_fqdn }}/privkey.pem'
     dest: '/usr/local/ispconfig/interface/ssl/ispserver.key'
     state: link
 
-- name: "ISPConfig-SSL | Assemble ispserver.pem 1/2"
-  assemble:
-    src: /usr/local/ispconfig/interface/ssl/ispserver.crt
-    dest: /usr/local/ispconfig/interface/ssl/ispserver.pem
-
-- name: "ISPConfig-SSL | Assemble ispserver.pem 2/2"
-  assemble:
-    src: /usr/local/ispconfig/interface/ssl/ispserver.key
-    dest: /usr/local/ispconfig/interface/ssl/ispserver.pem
-  validate: 'apache2 -t'
+- name: "ISPConfig-SSL | Assemble ispserver.pem"
+  shell: cat /usr/local/ispconfig/interface/ssl/ispserver.{key,crt} > /usr/local/ispconfig/interface/ssl/ispserver.pem
 
 - name: "ISPConfig-SSL | chmod 600 LE SSL"                                                                                                                                                    
   file:                                                                                                                                                                                                          
@@ -47,7 +41,7 @@
 
 - name: "ISPConfig-SSL | Put symlink of the LE SSL to pure-ftpd ssl location"
   file:
-    src: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.pem'
     dest: '/etc/ssl/private/pure-ftpd.pem'
     state: link
 
@@ -67,6 +61,12 @@
     path: /etc/dovecot/dovecot.conf
     regexp: 'ssl_key$'
     line: 'ssl_key = </etc/postfix/smtpd.key'
+
+- name: "ISPConfig-SSL | Set template file in /etc/init.d/le_ispc_pem.sh"
+  template:
+    src:  le_ispc_pem.sh
+    dest: /etc/init.d/le_ispc_pem.sh
+    mode: 0750
 
 - name: "ISPConfig-SSL | Setup Incron job"
   shell: echo "/etc/letsencrypt/archive/$(hostname -f)/ IN_MODIFY ./etc/init.d/le_ispc_pem.sh" >> /var/spool/incron/root
