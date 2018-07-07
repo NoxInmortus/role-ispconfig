@@ -3,7 +3,7 @@
 - name: "Main | Ensure /etc/facts.conf exist"
   file:
     path: /etc/facts.conf
-    state: file
+    state: touch
     owner: root
     group: root
     mode: 0644
