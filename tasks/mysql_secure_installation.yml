@@ -6,12 +6,6 @@
     - 127.0.0.1
     - ::1
 
-- name: "MySQL Secure | Reload privilege tables"
-  command: 'mysql -ne "{{ item }}"'
-  with_items:
-    - FLUSH PRIVILEGES
-  changed_when: False
-
 - name: "MySQL Secure | Remove anonymous users"
   command: 'mysql -ne "{{ item }}"'
   with_items:
