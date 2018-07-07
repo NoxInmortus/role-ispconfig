@@ -17,15 +17,6 @@
 - name: "Mailman | newaliases"
   shell: newaliases
 
-## Make sure the task does not start twice
-- name: "Mailman | Ensure /etc/facts.conf exist"
-  file:
-    path: /etc/facts.conf
-    state: file
-    owner: root
-    group: root
-    mode: 0644
-
 - name: "Mailman | Add mailman=yes to /etc/facts.conf"
   lineinfile:
     path: /etc/facts.conf

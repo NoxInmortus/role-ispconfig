@@ -37,15 +37,6 @@
     - FLUSH PRIVILEGES
   changed_when: False
 
-## Make sure the task does not start twice
-- name: "MySQL Secure | Ensure /etc/facts.conf exist"
-  file:
-    path: /etc/facts.conf
-    state: file
-    owner: root
-    group: root
-    mode: 0644
-
 - name: "MySQL Secure | Add mysql_secure=yes to /etc/facts.conf"
   lineinfile:
     path: /etc/facts.conf

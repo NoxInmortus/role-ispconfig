@@ -1,4 +1,13 @@
 ---
+## Make sure /etc/facts.conf exist (used for some tasks,ensuring theses does not start twice)
+- name: "Main | Ensure /etc/facts.conf exist"
+  file:
+    path: /etc/facts.conf
+    state: file
+    owner: root
+    group: root
+    mode: 0644
+
 ## JailKit repository
 - name: Include jailkit
   include: jailkit.yml
