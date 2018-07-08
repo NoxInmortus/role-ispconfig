@@ -2,6 +2,9 @@
 - name: "Restarting Services | Reload Systemd"
   systemd: daemon_reload=yes
 
+- name: "Restarting Services | Amavis"
+  service: name=amavis state=restarted
+
 - name: "Restarting Services | Postfix"
   service: name=postfix state=restarted
 
@@ -16,4 +19,5 @@
 
 - name: "Restarting Services | Fail2ban"
   service: name=fail2ban state=restarted
+
 
