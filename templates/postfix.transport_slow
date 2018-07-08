@@ -1,0 +1,4 @@
+#{{ ansible_managed }}
+{% for item in postfix_map_transport_slow %}
+{{ item }} slow:
+{% endfor %}

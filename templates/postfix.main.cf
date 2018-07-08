@@ -1,0 +1,79 @@
+myorigin = /etc/mailname
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+myhostname = smtp.imperium-gaming.fr
+
+mydestination = smtp.imperium-gaming.fr, localhost, localhost.local, localhost.localdomain
+mynetworks_style = subnet
+mynetworks = 127.0.0.0/8 [::1]/128
+inet_interfaces = all
+inet_protocols = all
+
+biff = no
+append_dot_mydomain = no
+readme_directory = no
+
+alias_maps = hash:/etc/aliases, hash:/var/lib/mailman/data/aliases
+alias_database = hash:/etc/aliases, hash:/var/lib/mailman/data/aliases
+
+relayhost =
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
+recipient_delimiter = +
+mailbox_size_limit = 0
+
+
+#smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+#smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_tls_cert_file = /etc/postfix/smtpd.cert
+smtpd_tls_key_file = /etc/postfix/smtpd.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
+smtpd_tls_protocols = !SSLv2,!SSLv3
+smtp_tls_protocols = !SSLv2,!SSLv3
+smtpd_tls_exclude_ciphers = RC4, aNULL
+smtp_tls_exclude_ciphers = RC4, aNULL
+smtp_tls_security_level = may
+#smtpd_tls_security_level = encrypt
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+
+transport_maps = hash:/etc/postfix/transport_slow, hash:/var/lib/mailman/data/transport-mailman, proxy:mysql:/etc/postfix/mysql-virtual_transports.cf
+
+slow_destination_recipient_limit = 20
+slow_destination_concurrency_limit = 2
+slow_destination_rate_delay = 2s
+
+# Sasl Auth
+smtpd_sasl_auth_enable = yes
+broken_sasl_auth_clients = yes
+smtpd_sasl_authenticated_header = yes
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+
+# Dovecot
+virtual_transport = dovecot
+dovecot_destination_recipient_limit = 1
+maildrop_destination_concurrency_limit = 1
+maildrop_destination_recipient_limit = 1
+
+# Restrictions
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, reject_rbl_client zen.spamhaus.org, check_recipient_access mysql:/etc/postfix/mysql-virtual_recipient.cf
+smtpd_helo_required = yes
+smtpd_helo_restrictions = permit_sasl_authenticated, permit_mynetworks, check_helo_access regexp:/etc/postfix/helo_access, reject_invalid_hostname, reject_non_fqdn_hostname, reject_invalid_helo_hostname, reject_unknown_helo_hostname, check_helo_access regexp:/etc/postfix/blacklist_helo
+smtpd_sender_restrictions = permit_mynetworks, permit_sasl_authenticated, check_sender_access mysql:/etc/postfix/mysql-virtual_sender.cf
+smtpd_client_restrictions = check_client_access mysql:/etc/postfix/mysql-virtual_client.cf
+smtpd_client_message_rate_limit = 100
+
+# Virtual domain & mailboxes
+virtual_alias_domains =
+virtual_alias_maps = hash:/var/lib/mailman/data/virtual-mailman, proxy:mysql:/etc/postfix/mysql-virtual_forwardings.cf, proxy:mysql:/etc/postfix/mysql-virtual_email2email.cf
+virtual_mailbox_domains = proxy:mysql:/etc/postfix/mysql-virtual_domains.cf
+virtual_mailbox_maps = proxy:mysql:/etc/postfix/mysql-virtual_mailboxes.cf
+virtual_mailbox_base = /var/vmail
+virtual_uid_maps = mysql:/etc/postfix/mysql-virtual_uids.cf
+virtual_gid_maps = mysql:/etc/postfix/mysql-virtual_gids.cf
+
+# Amavis
+content_filter=amavis:[127.0.0.1]:10024

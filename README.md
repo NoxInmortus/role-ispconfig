@@ -2,12 +2,16 @@
 
 This role install and configure the ensemble of tools for ISPConfig system.
 
-## ISPConfig Version :
+## Compatibility
+# ISPConfig Version :
 - 3.1.1
 
-## Compatible OS
-
+# Compatible OS
 - Debian Jessie
+
+# Ansible
+- Ansible 2.5
+- Did not test with previous versions
 
 ## Example Playbook
 
@@ -28,3 +32,4 @@ This role install and configure the ensemble of tools for ISPConfig system.
 - https://www.howtoforge.com/tutorial/perfect-server-debian-9-stretch-apache-bind-dovecot-ispconfig-3-1/2/
 - https://www.howtoforge.com/tutorial/securing-ispconfig-3-with-a-free-lets-encrypt-ssl-certificate/
 - https://github.com/ahrasis/LE4ISPC
+- https://www.security-helpzone.com/2015/12/03/securiser-postfix-avec-lantispam-amavis/

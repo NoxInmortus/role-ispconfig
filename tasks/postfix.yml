@@ -1,5 +1,10 @@
 ---
 - name: "Postfix | Configure /etc/postfix/master.cf"
   template:
-    src: postfix.master.cf
-    dest: /etc/postfix/master.cf
+    src: "{{ item }}"
+    dest: "/etc/postfix/{{ item }}"
+    mode: 0444
+  with_items:
+    - postfix.main.cf
+    - postfix.master.cf
+    - postfix.transport_slow
