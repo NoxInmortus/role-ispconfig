@@ -41,7 +41,10 @@
   include: mailman.yml
   tags:
     - ispconfig
-  when: mailman_email is defined and facts_mailman is failed
+  when: 
+    - mailman
+    - mailman_email is defined
+    - facts_mailman is failed
 
 ## PureFTPd Configuration
 - name: Include pure-ftpd

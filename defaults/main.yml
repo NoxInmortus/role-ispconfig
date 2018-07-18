@@ -117,6 +117,8 @@ others_packages:
   - fail2ban
   - incron
   - jailkit
+  - ntp
+  - ufw
 
 apache2_modules:
   - suexec
