@@ -42,7 +42,6 @@
   tags:
     - ispconfig
   when: 
-    - mailman
     - mailman_email is defined
     - facts_mailman is failed
 
