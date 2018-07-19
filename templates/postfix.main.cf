@@ -1,3 +1,4 @@
+#{{ ansible_managed }}
 myorigin = /etc/mailname
 smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 myhostname = smtp.imperium-gaming.fr

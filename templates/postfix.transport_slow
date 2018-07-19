@@ -1,4 +1,10 @@
 #{{ ansible_managed }}
-{% for item in postfix_map_transport_slow %}
-{{ item }} slow:
-{% endfor %}
+wanadoo.com slow:
+wanadoo.fr slow:
+orange.com slow:
+orange.fr slow:
+nordnet.fr slow:
+yopmail.com slow:
+laposte.net slow:
+free.fr slow:
+alice.fr slow:
