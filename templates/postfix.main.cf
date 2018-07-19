@@ -1,9 +1,9 @@
 #{{ ansible_managed }}
 myorigin = /etc/mailname
 smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
-myhostname = smtp.imperium-gaming.fr
+myhostname = {{ hostname_fqdn }}
 
-mydestination = smtp.imperium-gaming.fr, localhost, localhost.local, localhost.localdomain
+mydestination = {{ hostname_fqdn }}, localhost, localhost.local, localhost.localdomain
 mynetworks_style = subnet
 mynetworks = 127.0.0.0/8 [::1]/128
 inet_interfaces = all

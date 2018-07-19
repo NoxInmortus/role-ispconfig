@@ -38,15 +38,22 @@ Install the role, then :
 - hosts: localhost
   roles:
     - ispconfig
-```
+  vars:
+    hostname_fqdn: 'xx@xx.xx'
+    mysql_root_password: 'apfjapfjpaj'
 
+```
 
 ## Configuring the role
 ### Variables
 
 | VARIABLE                                        | TYPE          | REQUIRED | DEFAULT                                      | DESCRIPTION |
 |-------------------------------------------------|---------------|----------|----------------------------------------------|-------------|
-| mailman                                         | boolean       | no       | yes                                          | Install and configure mailman |
+| mysql_root_password                             | string        | yes      | none                                         | Needed by mysql |
+| hostname_fqdn                                   | string        | yes      | none                                         | Needed by the role |
+| mailman_email                                   | string        | no       | none                                         | Install and configure mailman if definied. Also need mailman_password |
+| mailman_password                                | string        | no       | none                                         | Needed by mailman_email |
+
 
 ## Sources
 - https://www.howtoforge.com/tutorial/perfect-server-debian-9-stretch-apache-bind-dovecot-ispconfig-3-1/2/
