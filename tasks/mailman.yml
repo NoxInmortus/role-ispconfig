@@ -16,7 +16,7 @@
     
 - name: "Mailman | Ensure /var/lib/mailman/aliases exist"
   file:
-    path: /var/lib/mailman/aliases
+    path: /var/lib/mailman/data/aliases
     state: touch
 
 - name: "Mailman | newaliases"
