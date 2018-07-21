@@ -13,6 +13,11 @@
     src: /etc/mailman/apache.conf
     dest: /etc/apache2/conf-enabled/mailman.conf
     state: link
+    
+- name: "Mailman | Ensure /var/lib/mailman/aliases exist"
+  file:
+    path: /var/lib/mailman/aliases
+    state: touch
 
 - name: "Mailman | newaliases"
   shell: newaliases
