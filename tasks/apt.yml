@@ -80,4 +80,10 @@
 
 #https://gist.github.com/arzzen/1209aa4a430bd95db3090a3399e6c35f
 - name: "Packages | Install php7.2-mycrypt"
-  shell: echo "" | pecl install mcrypt-1.0.1 -q
+  shell: echo "" | pecl install mcrypt-1.0.1
+  
+- name: "Packages | Configure php7.2-mycrypt 1/2"
+  shell: sudo bash -c "echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/cli/conf.d/mcrypt.ini"
+  
+- name: "Packages | Configure php7.2-mycrypt 2/2"
+  shell: sudo bash -c "echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/apache2/conf.d/mcrypt.ini"
