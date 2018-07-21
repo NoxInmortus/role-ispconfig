@@ -15,6 +15,12 @@ ispconfig_packages:
   - dovecot-lmtpd
   - amavisd-new
   - spamassassin
+  - gcc
+  - make 
+  - autoconf 
+  - libc-dev 
+  - pkg-config
+  - libmcrypt-dev
   - zoo
   - apache2
   - apache2-doc
@@ -22,13 +28,13 @@ ispconfig_packages:
   - libapache2-mod-php
   - phpmyadmin
   - apache2-suexec-pristine
-  - php7.2-mcrypt
   - mcrypt
   - imagemagick
   - memcached
   - php-memcache
   - php-imagick
   - php-gettext
+  - php-pear
   - php7.2
   - php7.2-common
   - php7.2-gd
@@ -49,6 +55,7 @@ ispconfig_packages:
   - php7.2-soap
   - php7.2-fpm
   - php7.2-opcache
+  - php7.2-dev
   - php-apcu
   - python-mysqldb
   - pure-ftpd-common 
@@ -95,11 +102,9 @@ others_packages:
   - daemon
   - zip
   - postgrey
-  - php-pear
   - mailman
   - geoip-database
   - build-essential 
-  - autoconf
   - automake
   - libtool
   - flex
