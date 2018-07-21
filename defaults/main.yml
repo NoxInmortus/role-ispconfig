@@ -20,40 +20,40 @@ ispconfig_packages:
   - apache2-doc
   - apache2-utils
   - libapache2-mod-php
-  - php7.0
-  - php7.0-common
-  - php7.0-gd
-  - php7.0-mysql
-  - php7.0-imap
   - phpmyadmin
-  - php7.0-cli
-  - php7.0-cgi
   - apache2-suexec-pristine
-  - php7.0-mcrypt
+  - php7.2-mcrypt
   - mcrypt
   - imagemagick
-  - php7.0-curl
-  - php7.0-intl
-  - php7.0-pspell
-  - php7.0-recode
-  - php7.0-sqlite3
-  - php7.0-tidy
-  - php7.0-xmlrpc
-  - php7.0-xsl
   - memcached
   - php-memcache
   - php-imagick
   - php-gettext
-  - php7.0-zip
-  - php7.0-mbstring
-  - php7.0-soap
-  - certbot
-  - php7.0-fpm
-  - php7.0-opcache
+  - php7.2
+  - php7.2-common
+  - php7.2-gd
+  - php7.2-mysql
+  - php7.2-imap
+  - php7.2-cli
+  - php7.2-cgi
+  - php7.2-curl
+  - php7.2-intl
+  - php7.2-pspell
+  - php7.2-recode
+  - php7.2-sqlite3
+  - php7.2-tidy
+  - php7.2-xmlrpc
+  - php7.2-xsl
+  - php7.2-zip
+  - php7.2-mbstring
+  - php7.2-soap
+  - php7.2-fpm
+  - php7.2-opcache
   - php-apcu
   - python-mysqldb
   - pure-ftpd-common 
   - pure-ftpd-mysql
+  - certbot
   - quota
   - quotatool
   - bind9

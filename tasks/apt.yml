@@ -41,6 +41,19 @@
     - { question: 'roundcube/password-confirm', value: '', vtype: 'password' }
     - { question: 'roundcube/mysql/admin-pass', value: '{{ mysql_root_password }}', vtype: 'password' }
 
+    
+- name: "PHP 7.2 | Download repository key"
+  get_url:
+    url: https://packages.sury.org/php/apt.gpg
+    dest: /etc/apt/trusted.gpg.d/php.gpg
+
+- name: "PHP 7.2 | Add repository"
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  with_items:
+    - deb https://packages.sury.org/php/ jessie main
+    
 - name: "Packages | apt-get update"
   apt:
     update_cache: yes
