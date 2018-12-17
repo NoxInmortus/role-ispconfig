@@ -1,0 +1,11 @@
+#{{ ansible_managed }}
+wanadoo.com slow:
+wanadoo.fr slow:
+orange.com slow:
+orange.fr slow:
+nordnet.fr slow:
+yopmail.com slow:
+laposte.net slow:
+free.fr slow:
+alice.fr slow:
+hotmail.fr slow:
