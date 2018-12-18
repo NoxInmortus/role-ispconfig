@@ -49,7 +49,7 @@ There is also an iptables sample with required firewall rules for make everythin
 
 ## Disclaimer
 
-This role is hudge, it install a lot of stuff (and it does not install clamav by the way), and although I managed to make dozens of tests, I may have missed a lot of issues, so feel free to contact me or to help me out improving this role.
+This role is hudge, it install a lot of stuff (and it does not install clamav by the way), and although I managed to make dozens of tests, I may have missed some issues, so feel free to contact me or to help me out improving this role.
 
 ## Requirement
 
@@ -71,11 +71,11 @@ Install the role, then :
 
 ## Configuring the role
 
-There is a lot of variables (list) used to manage packages and other stuff, feel free to take a look in defaults/mail.yml and to surcharge vars if needed.
+There is a lot of variables (list) used to manage packages and other stuff, feel free to take a look in defaults/main.yml and to surcharge vars if needed.
 
 The install process is quite clear and commented, all tasks have explicit name, you won't be lost if you want to understand how the whole stuff works.
 
-For a full installation, you will want to set every instal_xxx variables to true. But you would not want to install everything.
+For a full installation, you will want to set every `instal_xxx` variables to true. But you may not want to install everything.
 
 ### Variables
 
