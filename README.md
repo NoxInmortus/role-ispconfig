@@ -71,7 +71,7 @@ Install the role, then :
 
 ## Configuring the role
 
-There is a lot of variables (list) used to manage packages and other stuff, feel free to take a look in defaults/main.yml and to surcharge vars if needed.
+There is a lot of variables (list) used to manage packages and other stuff, feel free to take a look in `defaults/main.yml` and to surcharge vars if needed.
 
 The install process is quite clear and commented, all tasks have explicit name, you won't be lost if you want to understand how the whole stuff works.
 
@@ -83,7 +83,7 @@ For a full installation, you will want to set every `instal_xxx` variables to tr
 |------------------------------|--------|----------|---------|----------------------|
 | hostname_fqdn                | STRING | yes      | none    | FQDN for the system. |
 | mysql_root_password          | STRING | no       | none    | Mysql root password. A random password will be generated if not defined, but this is viable for a one-shot deployement, don't relaunch mysql tasks after that. |
-| admin_email                  | STRING | no       | none    | Required for mailman & rkhunter. |
+| admin_email                  | STRING | no       | none    | Required for mailman & used by rkhunter. |
 | admin_email_mailman_password | STRING | no       | none    | Required for mailman. A random password will be generated if admin_email is defined and install_mailman is true. |
 | security_whitelist           | LIST   | no       | none    | IPs to whitelist for fail2ban, postfix, roundcube and phpmyadmin |
 | pureftpd_passive_ports       | STRING | no       | '47000 47100' | Passive ports for pureftpd |
@@ -96,18 +96,18 @@ For a full installation, you will want to set every `instal_xxx` variables to tr
 | install_jailkit          | BOOL   | no       | false   | Install & configure jailkit |
 | install_postfix          | BOOL   | no       | false   | Install & configure postfix |
 | install_mail_security    | BOOL   | no       | false   | Install & configure amavis & spamassassin |
-| install_mailman          | BOOL   | no       | false   | Install & configure mailman. Require admin_email & mailman_password |
+| install_mailman          | BOOL   | no       | false   | Install & configure mailman. Require admin_email |
 | install_pureftpd         | BOOL   | no       | false   | Install & configure pureftpd |
 | install_pureftpd_ssl     | BOOL   | no       | false   | Configure SSL for pureftpd. Require ftp variables. Notice that ssl certificate will be overwrited if ispconfig_ssl tasks are deployed. |
 | install_apache2          | BOOL   | no       | false   | Install & configure apache2 |
 | install_php              | BOOL   | no       | false   | Install php7.0 |
-| install_php7_2           | BOOL   | no       | false   | Install php7.2 (will have php7.0 + php7.2) |
+| install_php7_2           | BOOL   | no       | false   | Install php7.2 (will have php7.0 + php7.2 as default version) |
 | install_mysql            | BOOL   | no       | false   | Install & configure mysql |
 | install_mysql_secure     | BOOL   | no       | false   | Deploy mysql_secure_installation tasks |
 | install_phpmyadmin       | BOOL   | no       | false   | Install phpmyadmin |
 | install_roundcube        | BOOL   | no       | false   | Install & configure roundcube. You need to run mysql and apache2 tasks before roundcube |
 | install_ispconfig        | BOOL   | no       | false   | Get ISPConfig installer in /tmp/ |
-| install_ispconfig_ssl    | BOOL   | no       | false   | Configure ISPConfig,postfix and pureftpd with let's encrypt certificate |
+| install_ispconfig_ssl    | BOOL   | no       | false   | Configure ISPConfig,postfix, pureftpd and dovecot with let's encrypt certificate |
 | install_metronome        | BOOL   | no       | false   | Install Metronome XMPP Server in /opt/metronome |
 | install_finalize         | BOOL   | no       | false   | Deploy finalization tasks |
 | mysql_already_installed  | BOOL   | no       | false   | Consider passing this var to true after a first deploy of mysql tasks. This will skip the mysql tasks using/touching the root password. Useful when you did not have defined mysql_root_password and it is generated automatically |
