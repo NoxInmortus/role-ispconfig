@@ -225,8 +225,6 @@ ispconfig_packages:
   - webalizer
   - awstats
   - binutils
-
-ispconfig_libraries:
   - libnet-ldap-perl
   - libauthen-sasl-perl
   - libio-string-perl

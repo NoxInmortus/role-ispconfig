@@ -17,14 +17,13 @@
     dest: /root/.my.cnf
     owner: root
     group: root
-    mode: 400
+    mode: 0400
   when: not mysql_already_installed
   no_log: true
 
 - name: "MySQL | Install packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items:
     - "{{ mysql_packages }}"
 

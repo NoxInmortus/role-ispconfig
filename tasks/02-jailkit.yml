@@ -22,7 +22,6 @@
 - name: "Jailkit | Install package"
   apt:
     name: "{{ item }}"
-    state: present
   when: not ansible_check_mode
   with_items:
     - jailkit

@@ -6,7 +6,6 @@
 - name: "Apache2 | Install packages"
   apt:
     name: "{{ item }}"
-    state: present
   register: apache2_package_install
   with_items:
     - "{{ apache2_packages }}"

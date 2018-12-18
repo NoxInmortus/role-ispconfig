@@ -16,14 +16,12 @@
 - name: "Postfix | Install packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items:
     - "{{ postfix_packages }}"
 
 - name: "Postfix | Install mail security packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items:
     - "{{ mail_security_packages }}"
   when: install_mail_security
@@ -40,7 +38,7 @@
   template:
     src: 03-postfix.amavis.avscanner.conf
     dest: /etc/amavis/conf.d/15-av_scanners
-    mode: 0644
+    mode: 0444
     owner: root
     group: root
   when: install_mail_security

@@ -11,7 +11,6 @@
     dest: /etc/hosts
     regexp: "^127.0.[1|0].1"
     line: "127.0.0.1 {{ hostname_fqdn }} {{ inventory_hostname }}"
-    state: present
     backup: yes
 
 ##########
@@ -54,7 +53,6 @@
   lineinfile:
     path: /etc/apt/sources.list
     line: "deb http://ftp.fr.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free"
-    state: present
 
 - name: "Pre-configuration | apt-get update"
   apt:
@@ -69,7 +67,6 @@
 - name: "Pre-configuration | Install common packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items:
     - "{{ preconfiguration_packages }}"
 
@@ -80,7 +77,6 @@
 - name: "Pre-configuration | Install security packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items:
     - "{{ security_packages }}"
   when:
@@ -127,4 +123,4 @@
 ###################
 
 - name: "Pre-configuration| Configure Incron"
-  shell: echo "root" >> /etc/incron.allow
+  shell: echo "root" > /etc/incron.allow

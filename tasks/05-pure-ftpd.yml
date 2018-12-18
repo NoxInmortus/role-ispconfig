@@ -6,7 +6,6 @@
 - name: "PureFTPd | Install packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items:
     - "{{ pureftpd_packages }}"
 
@@ -34,7 +33,6 @@
     state: directory
   when:
     - install_pureftpd_ssl
-    - ftp_ssl_country is defined
 
 ## This is tricky
 ## https://www.shellhacks.com/create-csr-openssl-without-prompt-non-interactive/
@@ -63,8 +61,8 @@
     state: mounted
     opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
     passno: 1
-  when: not ansible_check_mode or fstab_quota.stdout == "0"
   ignore_errors: yes
+  when: not ansible_check_mode or fstab_quota.stdout == "0"
 
 - name: "PureFTPd - Quota | Quota Check"
   command: quotacheck -avugm

@@ -6,18 +6,10 @@
 - name: "Packages | Install ISPConfig base packages"
   apt:
     name: "{{ item }}"
-    state: present
   with_items: "{{ ispconfig_packages }}"
-
-- name: "Packages | Install ISPConfig libraries"
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ ispconfig_libraries }}"
 
 - name: "Packages | Install packages through backports"
   apt:
     name: "{{ item }}"
-    state: present
     default_release: "{{ ansible_distribution_release }}-backports"
   with_items: "{{ backports_packages }}"

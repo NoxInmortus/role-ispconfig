@@ -16,7 +16,6 @@
 - name: "Mailman | Install package"
   apt:
     name: "{{ item }}"
-    state: present
   register: mailman_package_install
   with_items:
     - mailman
@@ -25,7 +24,6 @@
   set_fact:
     admin_email_mailman_password: "{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits') }}"
   when:
-    - admin_email is defined
     - admin_email_mailman_password is not defined
   no_log: true
 
@@ -61,5 +59,4 @@
 - name: "Mailman | Add mailman=yes to /etc/facts.conf"
   lineinfile:
     path: /etc/facts.conf
-    state: present
     line: 'mailman=yes'
