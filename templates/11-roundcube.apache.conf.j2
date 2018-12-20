@@ -11,17 +11,21 @@ Alias /webmail /var/lib/roundcube
   # content before setting AllowOverride to None.
   AllowOverride All
   <IfVersion >= 2.3>
+{% if security_whitelist is defined %}
 {% for ip in security_whitelist %}
     Require ip {{ ip }}
 {% endfor %}
+{% endif %}
     Require ip 127.0.0.1
     Require all denied
   </IfVersion>
   <IfVersion < 2.3>
     Order allow,deny
+{% if security_whitelist is defined %}
 {% for ip in security_whitelist %}
     Allow from {{ ip }}
 {% endfor %}
+{% endif %}
     Allow from 127.0.0.1
     Deny from all
   </IfVersion>

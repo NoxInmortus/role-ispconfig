@@ -33,9 +33,11 @@ Alias /databases /usr/share/phpmyadmin
         php_admin_value open_basedir /usr/share/phpmyadmin/:/etc/phpmyadmin/:/var/lib/phpmyadmin/:/usr/share/php/php-gettext/:/usr/share/php/php-gettext/:/usr/share/javascript/:/usr/share/php/tcpdf/:/usr/share/doc/phpmyadmin/:/usr/share/php/phpseclib/
         php_admin_value mbstring.func_overload 0
     </IfModule>
+{% if security_whitelist is defined %}
 {% for ip in security_whitelist %}
     Require ip {{ ip }}
 {% endfor %}
+{% endif %}
     Require ip 127.0.0.1
     Require all denied
 </Directory>
@@ -50,9 +52,11 @@ Alias /databases /usr/share/phpmyadmin
         </IfModule>
         Require valid-user
     </IfModule>
+{% if security_whitelist is defined %}
 {% for ip in security_whitelist %}
     Require ip {{ ip }}
 {% endfor %}
+{% endif %}
     Require ip 127.0.0.1
     Require all denied
 </Directory>
