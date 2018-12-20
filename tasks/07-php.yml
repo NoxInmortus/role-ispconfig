@@ -55,6 +55,7 @@
     state: directory
     owner: root
     group: root
+  when: install_php7_2
 
 # Check if mycrypt has already been installed
 - name: "PHP 7.2 | Check /etc/facts.conf for php_7_2_mycrypt=yes"
