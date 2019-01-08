@@ -57,7 +57,7 @@
 - name: "PureFTPd - Quota | Remounting partition"
   mount:
     path: /
-    src: {{ pureftpd_quota_mount }}
+    src: "{{ pureftpd_quota_mount }}"
     fstype: ext4
     state: mounted
     opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
