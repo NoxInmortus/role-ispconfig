@@ -130,7 +130,6 @@ apache2_modules:
   - alias
 
 apache2_disabled_conf:
-  - security
   - apache2-doc
   - charset
   - other-vhosts-access-log
