@@ -1,0 +1,15 @@
+---
+######################
+## Packages install ##
+######################
+
+- name: "Packages | Install ISPConfig base packages"
+  apt:
+    name: "{{ item }}"
+  with_items: "{{ ispconfig_packages }}"
+
+- name: "Packages | Install packages through backports"
+  apt:
+    name: "{{ item }}"
+    default_release: "{{ ansible_distribution_release }}-backports"
+  with_items: "{{ backports_packages }}"

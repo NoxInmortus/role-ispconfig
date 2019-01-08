@@ -1,0 +1,52 @@
+---
+##########################
+## Apache2 installation ##
+##########################
+
+- name: "Apache2 | Install packages"
+  apt:
+    name: "{{ item }}"
+  register: apache2_package_install
+  with_items:
+    - "{{ apache2_packages }}"
+
+- name: "Apache2 | Ensure /etc/apache2/conf.d exist"
+  file:
+    path: /etc/apache2/conf.d
+    state: directory
+    owner: root
+    group: root
+
+- name: "Apache2 | Configure /etc/apache2/apache2.conf (main config file)"
+  template:
+    src: "06-apache2.main.conf.j2"
+    dest: "/etc/apache2/apache2.conf"
+    mode: 0444
+  when: apache2_package_install.changed or '"apache2" in ansible_facts.packages'
+
+- name: "Apache2 | Configure additional conf /etc/apache2/conf-available"
+  template:
+    src: "06-apache2.{{ item }}"
+    dest: "/etc/apache2/conf-available/{{ item }}"
+    mode: 0444
+  with_items:
+    - httpoxy.conf
+    - badbots.conf
+    - security.conf
+  when: not ansible_check_mode or '"apache2" in ansible_facts.packages'
+
+- name: "Apache2 | Enable Apache modules"
+  apache2_module:
+    name: "{{ item }}"
+  with_items: "{{ apache2_modules }}"
+  when: not ansible_check_mode or '"apache2" in ansible_facts.packages'
+
+- name: "Apache2 | Enable Apache additional configs files"
+  command: "a2enconf {{ item }}"
+  with_items: "{{ apache2_conf }}"
+
+- name: "Apache2 | Disable Apache conf not needed anymore"
+  command: "a2disconf {{ item }}"
+  with_items: "{{ apache2_disabled_conf }}"
+  notify:
+    - restart apache2

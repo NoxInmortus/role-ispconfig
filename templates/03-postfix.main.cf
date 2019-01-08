@@ -1,0 +1,100 @@
+#{{ ansible_managed }}
+myorigin = /etc/mailname
+myhostname = {{ hostname_fqdn }}
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+
+mydestination = {{ hostname_fqdn }}, {{ inventory_hostname }}, localhost, localhost.localdomain
+mynetworks_style = subnet
+mynetworks = 127.0.0.0/8 [::1]/128 {% if security_whitelist is defined %}{{ security_whitelist|join(' ') }}{% endif %}
+
+inet_interfaces = all
+inet_protocols = ipv4
+
+biff = no
+append_dot_mydomain = no
+readme_directory = no
+
+relayhost = {% if postfix_relayhost is defined %}{{ postfix_relayhost }}{% endif %}
+
+smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
+recipient_delimiter = +
+mailbox_size_limit = 0
+relay_domains = mysql:/etc/postfix/mysql-virtual_relaydomains.cf
+relay_recipient_maps = mysql:/etc/postfix/mysql-virtual_relayrecipientmaps.cf
+smtpd_sender_login_maps = proxy:mysql:/etc/postfix/mysql-virtual_sender_login_maps.cf
+proxy_read_maps = $local_recipient_maps $mydestination $virtual_alias_maps $virtual_alias_domains $sender_bcc_maps $virtual_mailbox_maps $virtual_mailbox_domains $relay_recipient_maps $relay_domains $canonical_maps $sender_canonical_maps $recipient_canonical_maps $relocated_maps $transport_maps $mynetworks $smtpd_sender_login_maps
+
+## Postfix Certificate and TLS/SSL stuff
+#smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+#smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+smtpd_tls_cert_file = /etc/postfix/smtpd.cert
+smtpd_tls_key_file = /etc/postfix/smtpd.key
+smtpd_use_tls = yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3
+smtpd_tls_protocols = !SSLv2,!SSLv3
+smtp_tls_protocols = !SSLv2,!SSLv3
+smtpd_tls_exclude_ciphers = RC4, aNULL
+smtp_tls_exclude_ciphers = RC4, aNULL
+smtp_tls_security_level = may
+smtpd_tls_security_level = may
+smtpd_tls_auth_only = yes
+
+transport_maps = hash:/etc/postfix/transport_slow, {% if install_mailman %}hash:/var/lib/mailman/data/transport-mailman,{% endif %} proxy:mysql:/etc/postfix/mysql-virtual_transports.cf
+
+slow_destination_recipient_limit = 20
+slow_destination_concurrency_limit = 2
+slow_destination_rate_delay = 2s
+
+# Sasl Auth
+smtpd_sasl_auth_enable = yes
+broken_sasl_auth_clients = yes
+smtpd_sasl_authenticated_header = yes
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+
+# Dovecot
+virtual_transport = dovecot
+dovecot_destination_recipient_limit = 1
+maildrop_destination_concurrency_limit = 1
+maildrop_destination_recipient_limit = 1
+
+# Restrictions
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, reject_rbl_client zen.spamhaus.org, check_recipient_access mysql:/etc/postfix/mysql-virtual_recipient.cf, check_recipient_access mysql:/etc/postfix/mysql-virtual_policy_greylist.cf
+smtpd_helo_required = yes
+smtpd_helo_restrictions = permit_sasl_authenticated, permit_mynetworks, check_helo_access regexp:/etc/postfix/helo_access, reject_invalid_hostname, reject_non_fqdn_hostname, reject_invalid_helo_hostname, reject_unknown_helo_hostname, check_helo_access regexp:/etc/postfix/blacklist_helo
+smtpd_sender_restrictions = {% if install_mail_security %}check_sender_access regexp:/etc/postfix/tag_as_originating.re, check_sender_access regexp:/etc/postfix/tag_as_foreign.re, {% endif %}permit_mynetworks, permit_sasl_authenticated, check_sender_access mysql:/etc/postfix/mysql-virtual_sender.cf
+smtpd_client_message_rate_limit = 100
+
+# Postgrey
+smtpd_restriction_classes = greylisting
+greylisting = check_policy_service inet:127.0.0.1:10023
+
+# Virtual domain & mailboxes
+virtual_alias_domains =
+virtual_alias_maps = {% if install_mailman %}hash:/var/lib/mailman/data/virtual-mailman,{% endif %} proxy:mysql:/etc/postfix/mysql-virtual_forwardings.cf, proxy:mysql:/etc/postfix/mysql-virtual_email2email.cf
+virtual_mailbox_domains = proxy:mysql:/etc/postfix/mysql-virtual_domains.cf
+virtual_mailbox_maps = proxy:mysql:/etc/postfix/mysql-virtual_mailboxes.cf
+virtual_mailbox_base = /var/vmail
+virtual_uid_maps = mysql:/etc/postfix/mysql-virtual_uids.cf
+virtual_gid_maps = mysql:/etc/postfix/mysql-virtual_gids.cf
+
+alias_maps = hash:/etc/aliases{% if install_mailman %}, hash:/var/lib/mailman/data/aliases{% endif %}
+
+alias_database = hash:/etc/aliases{% if install_mailman %}, hash:/var/lib/mailman/data/aliases{% endif %}
+
+{% if install_mail_security %}
+# Amavis
+content_filter = amavis:[127.0.0.1]:10024
+{% endif %}
+
+# Miscallenious
+sender_bcc_maps = proxy:mysql:/etc/postfix/mysql-virtual_outgoing_bcc.cf
+header_checks = regexp:/etc/postfix/header_checks
+mime_header_checks = regexp:/etc/postfix/mime_header_checks
+nested_header_checks = regexp:/etc/postfix/nested_header_checks
+body_checks = regexp:/etc/postfix/body_checks
+owner_request_special = no
+receive_override_options = no_address_mappings

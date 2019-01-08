@@ -1,0 +1,16 @@
+---
+- name: "Finalize | Configure AWStats /etc/cron.d/awstats"
+  template:
+    src: 15-awstats
+    dest: /etc/cron.d/awstats
+
+- name: "Finalize | Reload Systemd"
+  systemd: daemon_reload=yes
+
+- name: "Finalize | Remove dependencies that are no longer required"
+  apt:
+    autoremove: yes
+
+- name: "Finalize | Update rkhunter database"
+  command: "rkhunter --propupd"
+  when: install_security_packages

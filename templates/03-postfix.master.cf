@@ -18,7 +18,6 @@ submission inet n       -       y       -       -       smtpd
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
-  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
 #  -o smtpd_reject_unlisted_recipient=no
 #  -o smtpd_client_restrictions=$mua_client_restrictions
 #  -o smtpd_helo_restrictions=$mua_helo_restrictions
@@ -30,7 +29,6 @@ smtps     inet  n       -       -       -       -       smtpd
   -o syslog_name=postfix/smtps
   -o smtpd_tls_wrappermode=yes
   -o smtpd_sasl_auth_enable=yes
-  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
 #  -o smtpd_reject_unlisted_recipient=no
 #  -o smtpd_client_restrictions=$mua_client_restrictions
 #  -o smtpd_helo_restrictions=$mua_helo_restrictions
@@ -78,7 +76,7 @@ scache    unix  -       -       y       -       1       scache
 # Also specify in main.cf: maildrop_destination_recipient_limit=1
 #
 maildrop  unix  -       n       n       -       -       pipe
-  flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
+  flags=DRhu user=vmail argv=/usr/bin/maildrop -d vmail ${extension} ${recipient} ${user} ${nexthop} ${sender}
 #
 # ====================================================================
 #
@@ -132,6 +130,7 @@ slow      unix  -       -        n      -       5        smtp
    -o smtp_destination_concurrency_limit=3
    -o slow_destination_rate_delay=1s
 
+{% if install_mail_security %}
 ## Amavis
 amavis unix - - n - 2 smtp
   -o smtp_data_done_timeout=1200
@@ -158,3 +157,22 @@ amavis unix - - n - 2 smtp
   -o smtpd_milters=
   -o local_recipient_maps=
   -o relay_recipient_maps=
+
+127.0.0.1:10027 inet n - n - - smtpd
+        -o content_filter=
+        -o local_recipient_maps=
+        -o relay_recipient_maps=
+        -o smtpd_restriction_classes=
+        -o smtpd_client_restrictions=
+        -o smtpd_helo_restrictions=
+        -o smtpd_sender_restrictions=
+        -o smtpd_recipient_restrictions=permit_mynetworks,reject
+        -o mynetworks=127.0.0.0/8
+        -o strict_rfc821_envelopes=yes
+        -o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+        -o smtp_send_xforward_command=yes
+           -o milter_default_action=accept
+        -o milter_macro_daemon_name=ORIGINATING
+        -o disable_dns_lookups=yes
+
+{% endif %}

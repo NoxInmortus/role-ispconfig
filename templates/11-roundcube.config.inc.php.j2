@@ -63,13 +63,13 @@ $config['smtp_pass'] = '';
 $config['support_url'] = '';
 
 // Name your service. This is displayed on the login screen and in the window title
-$config['product_name'] = 'Roundcube Imperium Webmail';
+$config['product_name'] = 'Roundcube Webmail';
 
 // this key is used to encrypt the users imap password which is stored
 // in the session record (and the client cookie if remember password is enabled).
 // please provide a string of exactly 24 chars.
 // YOUR KEY MUST BE DIFFERENT THAN THE SAMPLE VALUE FOR SECURITY REASONS
-$config['des_key'] = '[RJVC9ZUt77C7WwXBMA1zWs5';
+$config['des_key'] = '{{ roundcube_des_key_password }}';
 
 // List of active plugins (in plugins/ directory)
 // Debian: install roundcube-plugins first to have any

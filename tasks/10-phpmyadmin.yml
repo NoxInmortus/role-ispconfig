@@ -1,0 +1,27 @@
+---
+- name: "Packages | Debconf for phpmyadmin"
+  debconf:
+    name: phpmyadmin
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'phpmyadmin/reconfigure-webserver', value: 'apache2', vtype: 'multiselect' }
+    - { question: 'phpmyadmin/dbconfig-install', value: 'true', vtype: 'boolean' }
+    - { question: 'phpmyadmin/mysql/admin-pass', value: '', vtype: 'password' }
+  no_log: true
+
+- name: "PhpMyAdmin | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - phpmyadmin
+
+- name: "PhpMyAdmin | Configure /etc/apache2/conf-available/phpmyadmin.conf"
+  template:
+    src: 10-phpmyadmin.apache.conf.j2
+    dest: /etc/apache2/conf-available/phpmyadmin.conf
+  when:
+    - not ansible_check_mode or '"phpmyadmin" in ansible_facts.packages'
+  notify:
+    - restart apache2

@@ -1,3 +1,25 @@
 ---
+###################
+## Handlers file ## Handlers are only fired when certain tasks report changes, and are run at the end of each play
+################### There is only service restart here
+
+- name: restart fail2ban
+  service: name=fail2ban state=restarted
+
+- name: restart amavis
+  service: name=amavis state=restarted
+
+- name: restart postfix
+  service: name=postfix state=restarted
+
+- name: restart apache2
+  service: name=apache2 state=restarted
+
 - name: restart mysql
   service: name=mysql state=restarted
+
+- name: restart pureftpd
+  service: name=pure-ftpd-mysql state=restarted
+
+- name: restart dovecot
+  service: name=dovecot state=restarted

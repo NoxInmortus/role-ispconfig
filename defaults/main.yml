@@ -1,40 +1,196 @@
 ---
-ispconfig_packages:
+########################
+## Installation Setup ##
+########################
+#hostname_fqdn:
+#mysql_root_password:
+#admin_email:
+#mailman_password:
+#security_whitelist:
+pureftpd_passive_ports: '47000 47100'
+#pureftpd_quota_mount:
+
+#ftp_ssl_country:
+#ftp_ssl_state:
+#ftp_ssl_locality:
+#ftp_ssl_organization:
+#ftp_ssl_ou:
+
+install_preconfiguration: false
+install_apt: false
+install_security_packages: false
+install_jailkit: false
+install_postfix: false
+install_mail_security: false
+install_mailman: false
+install_pureftpd: false
+install_pureftpd_ssl: false
+install_apache2: false
+install_php: false
+install_php7_1: false
+install_php7_2: false
+install_mysql: false
+install_mysql_secure: false
+install_phpmyadmin: false
+install_roundcube: false
+install_ispconfig: false
+install_ispconfig_ssl: false
+install_finalize: false
+install_metronome: false
+
+mysql_already_installed: false
+roundcube_already_installed: false
+
+################################
+## Pre-configuration packages ##
+################################
+preconfiguration_packages:
+  - sudo
+  - unzip
+  - bzip2
+  - arj
+  - nomarch
+  - lzop
+  - cabextract
+  - apt-listchanges
+  - daemon
+  - git
+  - zip
+  - geoip-database
+  - build-essential
+  - automake
+  - libtool
+  - flex
+  - bison
+  - debhelper
+  - incron
+  - ntp
+  - openssl
+  - gcc
+  - make
+  - autoconf
+  - libc-dev
+  - pkg-config
+  - vim
+  - openssh-client
+  - openssh-server
+  - debconf-utils
+
+security_packages:
+  - rkhunter
+  - fail2ban
+  - ufw
+
+###################
+## Mail packages ##
+###################
+postfix_packages:
   - postfix
   - postfix-mysql
-  - postfix-doc
-  - mariadb-client
-  - mariadb-server
-  - openssl
-  - getmail4
-  - binutils
-  - dovecot-imapd
-  - dovecot-pop3d
-  - dovecot-mysql
-  - dovecot-sieve
-  - dovecot-lmtpd
+  - postgrey
+
+mail_security_packages:
   - amavisd-new
   - spamassassin
-  - gcc
-  - make 
-  - autoconf 
-  - libc-dev 
-  - pkg-config
-  - libmcrypt-dev
-  - zoo
+
+########################
+## Pure-ftpd packages ##
+########################
+pureftpd_packages:
+  - pure-ftpd-common
+  - pure-ftpd-mysql
+  - quota
+  - quotatool
+
+##################
+## Apache stuff ##
+##################
+apache2_packages:
   - apache2
   - apache2-doc
   - apache2-utils
-  - libapache2-mod-php
-  - phpmyadmin
   - apache2-suexec-pristine
-  - mcrypt
-  - imagemagick
-  - memcached
-  - php-memcache
-  - php-imagick
-  - php-gettext
-  - php-pear
+  - libapache2-mod-php
+  - libapache2-mod-fcgid
+  - libapache2-mod-python
+  - libapache2-mod-passenger
+
+apache2_modules:
+  - suexec
+  - rewrite
+  - ssl
+  - actions
+  - include
+  - dav_fs
+  - dav
+  - auth_digest
+  - cgi
+  - headers
+  - proxy_fcgi
+  - alias
+
+apache2_disabled_conf:
+  - security
+  - apache2-doc
+  - charset
+  - other-vhosts-access-log
+  - localized-error-pages
+
+apache2_conf: # it breaks "Apache2 | Configure additional conf /etc/apache2/conf-available" task when used..
+  - httpoxy
+  - badbots
+  - security
+
+##################
+## PHP PACKAGES ##
+##################
+php7_0_packages:
+  - php7.0
+  - php7.0-common
+  - php7.0-gd
+  - php7.0-mysql
+  - php7.0-imap
+  - php7.0-cli
+  - php7.0-cgi
+  - php7.0-mcrypt
+  - php7.0-curl
+  - php7.0-intl
+  - php7.0-pspell
+  - php7.0-recode
+  - php7.0-sqlite3
+  - php7.0-tidy
+  - php7.0-xmlrpc
+  - php7.0-xsl
+  - php7.0-zip
+  - php7.0-mbstring
+  - php7.0-soap
+  - php7.0-fpm
+  - php7.0-opcache
+
+php7_1_packages:
+  - php7.1
+  - php7.1-common
+  - php7.1-gd
+  - php7.1-mysql
+  - php7.1-imap
+  - php7.1-cli
+  - php7.1-cgi
+  - php7.1-mcrypt
+  - php7.1-curl
+  - php7.1-intl
+  - php7.1-pspell
+  - php7.1-recode
+  - php7.1-sqlite3
+  - php7.1-tidy
+  - php7.1-xmlrpc
+  - php7.1-xsl
+  - php7.1-zip
+  - php7.1-mbstring
+  - php7.1-soap
+  - php7.1-fpm
+  - php7.1-opcache
+
+php7_2_packages:
   - php7.2
   - php7.2-common
   - php7.2-gd
@@ -56,79 +212,70 @@ ispconfig_packages:
   - php7.2-fpm
   - php7.2-opcache
   - php7.2-dev
+
+php_other_packages:
+  - php-memcache
+  - php-imagick
+  - php-gettext
+  - php-pear
   - php-apcu
+
+####################
+## MySQL packages ##
+####################
+mysql_packages:
+  - mariadb-client
+  - mariadb-server
   - python-mysqldb
-  - pure-ftpd-common 
-  - pure-ftpd-mysql
-  - certbot
-  - quota
-  - quotatool
+  - libdbd-mysql-perl
+  - libclass-dbi-mysql-perl
+
+#############################
+## ISPConfig base packages ##
+#############################
+ispconfig_packages:
+  - getmail4
+  - dovecot-imapd
+  - dovecot-pop3d
+  - dovecot-mysql
+  - dovecot-sieve
+  - dovecot-lmtpd
+  - libmcrypt-dev
+  - zoo
+  - mcrypt
+  - imagemagick
+  - memcached
   - bind9
   - dnsutils
   - haveged
   - webalizer
   - awstats
   - binutils
-  - roundcube
-  - roundcube-core
-  - roundcube-mysql
-  - roundcube-plugins
-
-ispconfig_libraries:
-  - libapache2-mod-fcgid
-  - libapache2-mod-python
-  - libapache2-mod-passenger
   - libnet-ldap-perl
   - libauthen-sasl-perl
   - libio-string-perl
   - libio-socket-ssl-perl
   - libnet-ident-perl
   - libnet-dns-perl
-  - libdbd-mysql-perl
   - libruby
-  - libclass-dbi-mysql-perl
   - libtimedate-perl
 
-others_packages:
-  - rkhunter
-  - sudo
-  - unzip
-  - bzip2
-  - arj
-  - nomarch
-  - lzop
-  - cabextract
-  - apt-listchanges
-  - daemon
-  - zip
-  - postgrey
-  - mailman
-  - geoip-database
-  - build-essential 
-  - automake
-  - libtool
-  - flex
-  - bison
-  - debhelper
-  - fail2ban
-  - incron
-  - jailkit
-  - ntp
-  - ufw
+backports_packages:
+  - certbot
 
-apache2_modules:
-  - suexec
-  - rewrite
-  - ssl
-  - actions
-  - include
-  - dav_fs
-  - dav
-  - auth_digest
-  - cgi
-  - headers
-  - proxy_fcgi
-  - alias
-
-apache2_conf:
-  - httpoxy
+########################
+## Metronome Packages ##
+########################
+metronome_packages:
+  - lua5.1
+  - liblua5.1-0-dev
+  - lua-filesystem
+  - libidn11-dev
+  - libssl-dev
+  - lua-zlib
+  - lua-expat
+  - lua-event
+  - lua-bitop
+  - lua-socket
+  - lua-sec
+  - luarocks

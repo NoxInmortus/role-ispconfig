@@ -1,0 +1,147 @@
+---
+#################################
+## ISPConfig Let's Encrypt SSL ## https://www.howtoforge.com/tutorial/securing-ispconfig-3-with-a-free-lets-encrypt-ssl-certificate/
+#################################
+
+- name: "ISPConfig-SSL | Check if original certificates exists : ispserver"
+  stat: path=/usr/local/ispconfig/interface/ssl/ispserver.crt
+  register: original_cert_ispserver
+
+- name: "ISPConfig-SSL | Check if original certificates exists : postfix"
+  stat: path=/etc/postfix/smtpd.cert
+  register: original_cert_postfix
+
+- name: "ISPConfig-SSL | Check if original certificates exists : pureftpd"
+  stat: path=/etc/ssl/private/pure-ftpd.pem
+  register: original_cert_pureftpd
+
+######################
+## Backup old certs ##
+######################
+- name: "ISPConfig-SSL | Backup old ispconfig certificate"
+  shell: mv {{ item }}/ispserver.crt {{ item }}/ispserver.crt-$(date +"%y%m%d%H").bak && mv {{ item }}/ispserver.key {{ item }}/ispserver.key-$(date +"%y%m%d%H").bak
+  with_items: /usr/local/ispconfig/interface/ssl
+  when: original_cert_ispserver.stat.exists
+
+- name: "ISPConfig-SSL | Backup old postfix certificate"
+  shell: mv {{ item }}/smtpd.cert {{ item }}/smtpd.cert-$(date +"%y%m%d%H").bak && mv {{ item }}/smtpd.key {{ item }}/smtpd.key-$(date +"%y%m%d%H").bak
+  with_items: /etc/postfix
+  when:
+    - install_postfix
+    - original_cert_postfix.stat.exists
+
+- name: "ISPConfig-SSL | Backup old pureftpd certificate"
+  shell: mv {{ item }} {{ item }}-$(date +"%y%m%d%H").bak
+  with_items: /etc/ssl/private/pure-ftpd.pem
+  when:
+    - not ansible_check_mode
+    - install_pureftpd_ssl
+    - original_cert_pureftpd.stat.exists
+
+######################################
+## Symlinks to replace certificates ##
+######################################
+## ISPConfig
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to ispconfig location 1/2"
+  file:
+    src: '/etc/letsencrypt/live/{{ hostname_fqdn }}/fullchain.pem'
+    dest: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
+    state: link
+  when: not ansible_check_mode
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to ispconfig location 2/2"
+  file:
+    src: '/etc/letsencrypt/live/{{ hostname_fqdn }}/privkey.pem'
+    dest: '/usr/local/ispconfig/interface/ssl/ispserver.key'
+    state: link
+  when: not ansible_check_mode
+
+###########################################################
+## Assemble ispserver.cert and ispserver.key in pem file ##
+###########################################################
+- name: "ISPConfig-SSL | Assemble ispserver.pem"
+  shell: cat {{ item }}/ispserver.{key,crt} > {{ item }}/ispserver.pem
+  with_items: /usr/local/ispconfig/interface/ssl
+
+###############################
+## Chmod 400 on certificates ##
+###############################
+- name: "ISPConfig-SSL | chmod 400 LE SSL"
+  file:
+    path: "{{ item }}"
+    mode: 0400
+  with_items:
+    - /usr/local/ispconfig/interface/ssl/ispserver.pem
+  when: not ansible_check_mode
+  notify:
+    - restart apache2
+
+######################################
+## Symlinks to replace certificates ##
+######################################
+
+## Postfix
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to postfix location 1/2"
+  file:
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.key'
+    dest: '/etc/postfix/smtpd.key'
+    state: link
+  when: not ansible_check_mode
+
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to postfix location 2/2"
+  file:
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.crt'
+    dest: '/etc/postfix/smtpd.cert'
+    state: link
+  when: not ansible_check_mode
+  notify:
+    - restart postfix
+
+## Pure-ftpd
+- name: "ISPConfig-SSL | Put symlink of the LE SSL to pure-ftpd ssl location"
+  file:
+    src: '/usr/local/ispconfig/interface/ssl/ispserver.pem'
+    dest: '/etc/ssl/private/pure-ftpd.pem'
+    state: link
+  when: not ansible_check_mode
+  notify:
+    - restart pureftpd
+
+###########################
+## Setup SSL for dovecot ##
+###########################
+
+- name: "ISPConfig-SSL | Setup ssl cert for dovecot 1/2"
+  lineinfile:
+    path: /etc/dovecot/dovecot.conf
+    regexp: 'ssl_cert$'
+    line: 'ssl_cert = </etc/postfix/smtpd.cert'
+    backrefs: yes
+
+- name: "ISPConfig-SSL | Setup ssl cert for dovecot 2/2"
+  lineinfile:
+    path: /etc/dovecot/dovecot.conf
+    regexp: 'ssl_key$'
+    line: 'ssl_key = </etc/postfix/smtpd.key'
+    backrefs: yes
+  notify:
+    - restart dovecot
+
+########################################
+## Incron job for certificate renewal ##
+########################################
+- name: "ISPConfig-SSL | Set script /etc/init.d/le_ispc_pem.sh"
+  template:
+    src:  "13-{{ item }}"
+    dest: "/etc/init.d/{{ item }}"
+    mode: 0750
+  with_items:
+    - le_ispc_pem.sh
+
+- name: "ISPConfig-SSL | Set incron"
+  template:
+    src:  "13-{{ item }}"
+    dest: "/etc/incron.d/{{ item }}"
+    mode: 0444
+  with_items:
+    - incron

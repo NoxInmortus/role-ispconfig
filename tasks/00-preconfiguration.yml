@@ -1,0 +1,126 @@
+---
+##############
+## Hostname ##
+##############
+- name: "Pre-configuration | Set the hostname"
+  hostname:
+    name: '{{ inventory_hostname }}'
+
+- name: "Pre-configuration | Build hosts file (backups will be made)"
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^127.0.[1|0].1"
+    line: "127.0.0.1 {{ hostname_fqdn }} {{ inventory_hostname }}"
+    backup: yes
+
+##########
+## Dash ##
+##########
+- name: "Pre-configuration | Configure Dash 1/2"
+  debconf:
+    name: dash
+    question: dash/sh
+    value: 'false'
+    vtype: select
+  register: dash
+
+- name: "Pre-configuration | Configure Dash 2/2"
+  command: dpkg-reconfigure -fnoninteractive dash
+  when: dash.changed
+
+################
+## Facts.conf ##
+################
+## Make sure /etc/facts.conf exist (used for some tasks,ensuring theses does not start twice)
+- name: "Pre-configuration | Check if /etc/facts.conf exists"
+  stat: path=/etc/facts.conf
+  register: facts_conf_file
+
+- name: "Pre-configuration | Ensure /etc/facts.conf exist"
+  file:
+    path: /etc/facts.conf
+    state: touch
+    owner: root
+    group: root
+    mode: 0440
+  when: facts_conf_file.stat.exists == False
+
+#####################
+## Common packages ##
+#####################
+
+- name: "Pre-configuration | Add backports sourcelist"
+  lineinfile:
+    path: /etc/apt/sources.list
+    line: "deb http://ftp.fr.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free"
+
+- name: "Pre-configuration | apt-get update"
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: "Pre-configuration | Upgrade all packages to the latest version"
+  apt:
+    name: "*"
+    state: latest
+
+- name: "Pre-configuration | Install common packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ preconfiguration_packages }}"
+
+#######################
+## Security packages ##
+#######################
+
+- name: "Pre-configuration | Install security packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ security_packages }}"
+  when:
+    - install_security_packages
+
+- name: "Pre-configuration | Configure fail2ban /etc/fail2ban/jail.local"
+  template:
+    src: 00-f2b.jail.local.j2
+    dest: /etc/fail2ban/jail.local
+  when:
+    - not ansible_check_mode
+    - install_security_packages
+
+- name: "Pre-configuration | Configure fail2ban filters"
+  template:
+    src: "00-f2b.{{ item }}.conf"
+    dest: "/etc/fail2ban/filter.d/{{ item }}.conf"
+  with_items:
+    - apache-dos
+    - apache-w00tw00t
+    - apache-phpmyadmin
+  when:
+    - not ansible_check_mode
+    - install_security_packages
+  notify:
+    - restart fail2ban
+
+- name: "Pre-configuration | Configure /etc/default/rkhunter"
+  template:
+    src: 00-default.rkhunter.j2
+    dest: /etc/default/rkhunter
+  when:
+    - install_security_packages
+
+- name: "Pre-configuration | Configure /etc/rkhunter.conf"
+  template:
+    src: 00-rkhunter.conf.j2
+    dest: /etc/rkhunter.conf
+  when:
+    - install_security_packages
+
+###################
+## Miscallenious ##
+###################
+
+- name: "Pre-configuration| Configure Incron"
+  shell: echo "root" > /etc/incron.allow

@@ -1,32 +1,45 @@
 ---
-## Make sure /etc/facts.conf exist (used for some tasks,ensuring theses does not start twice)
-- name: "Main | Ensure /etc/facts.conf exist"
-  file:
-    path: /etc/facts.conf
-    state: touch
-    owner: root
-    group: root
-    mode: 0644
 
-## JailKit repository
-- name: Include jailkit
-  include: jailkit.yml
-  tags:
-    - ispconfig
+- name: "ISPConfig | Gathering package facts"
+  package_facts:
+    manager: apt
 
-## Debconf configurations and package installations
+#############################
+## Pre-configuration tasks ##
+#############################
+
+- name: Include pre-configuration tasks
+  include: 00-preconfiguration.yml
+  when: install_preconfiguration
+  tags: ispconfig_preconfiguration
+
+########################################
+## APT - Common packages installation ##
+########################################
 - name: Include apt
-  include: apt.yml
-  tags:
-    - ispconfig
+  include: 01-apt.yml
+  when: install_apt
+  tags: ispconfig_apt
 
-## Postfix templating
+#############
+## JailKit ##
+#############
+- name: Include jailkit
+  include: 02-jailkit.yml
+  when: install_jailkit
+  tags: ispconfig_jailkit
+
+#############
+## Postfix ##
+#############
 - name: Include postfix
-  include: postfix.yml
-  tags:
-    - ispconfig
+  include: 03-postfix.yml
+  when: install_postfix
+  tags: ispconfig_postfix
 
-## Mailman templating
+########################
+## Mailman templating ##
+########################
 - name: "Mailman | Check /etc/facts.conf for mailman=yes"
   lineinfile:
     path: /etc/facts.conf
@@ -36,34 +49,48 @@
   register: facts_mailman
   failed_when: (facts_mailman is changed) or (facts_mailman is failed)
   ignore_errors: True
+  when: install_mailman
+  tags: ispconfig_mailman
 
 - name: Include mailman
-  include: mailman.yml
-  tags:
-    - ispconfig
-  when: 
-    - mailman_email is defined
+  include: 04-mailman.yml
+  when:
     - facts_mailman is failed
+    - install_mailman
+    - admin_email is defined
+  tags: ispconfig_mailman
 
-## PureFTPd Configuration
+##############
+## PureFTPd ##
+##############
 - name: Include pure-ftpd
-  include: pure-ftpd.yml
-  tags:
-    - ispconfig
+  include: 05-pure-ftpd.yml
+  when: install_pureftpd
+  tags: ispconfig_pureftpd
 
-## Apache2 Configuration
+#############
+## Apache2 ##
+#############
 - name: Include apache2
-  include: apache2.yml
-  tags:
-    - ispconfig
-  when: not ansible_check_mode
+  include: 06-apache2.yml
+  when: install_apache2
+  tags: ispconfig_apache2
 
-## MySQL Configuration
+##########
+## PHP ##
+#########
+- name: Include php
+  include: 07-php.yml
+  when: install_php or install_php7_2
+  tags: ispconfig_php
+
+#########################
+## MySQL Configuration ##
+#########################
 - name: Include mysql
-  include: mysql.yml
-  tags:
-    - ispconfig
-  when: not ansible_check_mode
+  include: 08-mysql.yml
+  when: install_mysql
+  tags: ispconfig_mysql
 
 - name: "MySQL Secure | Check /etc/facts.conf for mysql_secure=yes"
   lineinfile:
@@ -74,51 +101,88 @@
   register: facts_mysql_secure
   failed_when: (facts_mysql_secure is changed) or (facts_mysql_secure is failed)
   ignore_errors: True
+  when:
+    - install_mysql
+    - install_mysql_secure
+  tags: ispconfig_mysql_secure
 
 - name: Include mysql-secure
-  include: mysql_secure_installation.yml
-  tags:
-    - ispconfig
-  when: not ansible_check_mode and facts_mysql_secure is failed
+  include: 09-mysql_secure_installation.yml
+  when:
+    - not ansible_check_mode
+    - facts_mysql_secure is failed
+    - install_mysql
+    - install_mysql_secure
+    - not mysql_already_installed
+    - mysql_root_password is defined
+  tags: ispconfig_mysql_secure
 
-## Roundcube Configuration
+###############
+## PhpMyAdmin ##
+###############
+- name: Include phpmyadmin
+  include: 10-phpmyadmin.yml
+  when: install_phpmyadmin
+  tags: ispconfig_phpmyadmin
+
+###############
+## Roundcube ##
+###############
 - name: Include roundcube
-  include: roundcube.yml
-  tags:
-    - ispconfig
+  include: 11-roundcube.yml
+  when:
+    - install_roundcube
+    - install_mysql
+    - install_apache2
+    - mysql_root_password is defined
+  tags: ispconfig_roundcube
 
-## Various Configurations
-- name: Include others
-  include: others.yml
-  tags:
-    - ispconfig
-
-## ISPConfig Installer Download
+#########################
+## ISPConfig Installer ##
+#########################
 - name: "ISPConfig Installer | Check if folder already exist"
   stat:
     path: /tmp/ispconfig3_install
   register: isp_install_dir
+  when: install_ispconfig
+  tags: ispconfig_installer
 
-- name: Include ispconfig-installer
-  include: ispconfig-installer.yml
-  tags:
-    - ispconfig
-  when: isp_install_dir.stat.exists == false
+- name: Include ispconfig
+  include: 12-ispconfig.yml
+  when:
+    - install_ispconfig
+    - isp_install_dir.stat.exists == false
+  tags: ispconfig_installer
 
-## ISPConfig Configuration with Let's Encrypt SSL (after being generated)
+############################################################################
+## ISPConfig Configuration with Let's Encrypt SSL (after being generated) ##
+############################################################################
 - name: "ISPConfig-SSL | Check if let's encrypt SSL for ISPConfig exist"
   stat:
     path: /etc/letsencrypt/live/{{ hostname_fqdn }}
   register: le_ssl
+  when: install_ispconfig_ssl
+  tags: ispconfig_ssl
 
 - name: Include ispconfig-ssl
-  include: ispconfig-ssl.yml
-  tags:
-    - ispconfig
-  when: le_ssl.stat.exists
+  include: 13-ispconfig-ssl.yml
+  when:
+    - install_ispconfig_ssl
+    - le_ssl.stat.exists
+  tags: ispconfig_ssl
 
-## Restarting Services
-- name: Include services
-  include: services.yml
-  tags:
-    - ispconfig
+###########################
+## Metronome XMPP Server ##
+###########################
+- name: Include metronome
+  include: 14-metronome_xmpp.yml
+  when: install_metronome
+  tags: ispconfig_metronome
+
+#######################################
+## Finalize (miscallenious, cleanup) ##
+#######################################
+- name: Include finalize file
+  include: 15-finalize.yml
+  when: install_finalize
+  tags: ispconfig_finalize

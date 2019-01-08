@@ -11,7 +11,8 @@ ftp: root
 abuse: root
 noc: root
 security: root
-root: user
+backups: root
+root: root
 
 ## mailman mailing list
 mailman:              "|/var/lib/mailman/mail/mailman post mailman"

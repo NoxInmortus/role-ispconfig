@@ -1,0 +1,117 @@
+[DEFAULT]
+ignoreip = 127.0.0.1 {% if security_whitelist is defined %}{{ security_whitelist|join(' ') }}{% endif %}
+
+findtime = 3600
+bantime = 86400
+maxretry = 3
+
+[apache]
+enabled = true
+port = http,https
+filter = apache-auth
+logpath = /var/log/apache2/*error.log
+
+[apache-nohome]
+enabled  = true
+port     = http,https
+filter   = apache-nohome
+logpath  = /var/log/apache*/*error.log
+
+[apache-noscript]
+enabled = true
+port = http,https
+filter = apache-noscript
+logpath = /var/log/apache2/*error.log
+
+[apache-overflows]
+enabled = true
+port = http,https
+filter = apache-overflows
+logpath = /var/log/apache2/*error.log
+
+[apache-badbots]
+enabled = true
+port = http,https
+filter = apache-badbots
+logpath = /var/log/apache2/*error.log
+
+[apache-botsearch]
+enabled = true
+port = http,https
+filter = apache-botsearch
+logpath = /var/log/apache2/*error.log
+
+[apache-fakegooglebot]
+port          = http,https
+logpath       = %(apache_access_log)s
+maxretry      = 1
+ignorecommand = %(ignorecommands_dir)s/apache-fakegooglebot <ip>
+enabled       = true
+
+[apache-dos]
+enabled = true
+port = http,https
+filter = apache-dos
+logpath = /var/log/apache2/access.log
+
+[apache-modsecurity]
+enabled      = true
+maxretry     = 2
+journalmatch =
+backend      = polling
+
+[apache-shellshock]
+enabled      = true
+maxretry     = 1
+journalmatch =
+backend      = polling
+
+[apache-w00tw00t]
+enabled = true
+filter  = apache-w00tw00t
+port = http,https
+banaction = iptables-allports
+logpath  = /var/log/apache*/*access*.log
+maxretry = 1
+
+[apache-phpmyadmin]
+enabled = true
+port = http,https
+filter = apache-phpmyadmin
+logpath = /var/log/apache*/*error*.log
+
+[pure-ftpd]
+enabled = true
+port = ftp
+filter = pure-ftpd
+logpath = /var/log/syslog
+
+[dovecot]
+enabled = true
+filter = dovecot
+logpath = /var/log/mail.log
+
+[php-url-fopen]
+enabled = true
+port    = http,https
+filter  = php-url-fopen
+logpath = /var/log/apache*/*access.log
+
+[postfix-sasl]
+enabled = true
+port = smtp
+filter = postfix-sasl
+logpath = /var/log/mail.log
+
+[roundcube]
+enabled  = true
+port     = http,https
+filter   = roundcube-auth
+action   = iptables-multiport[name=roundcube, port="http,https"]
+logpath  = /var/log/roundcube/errors
+
+[ssh]
+enabled = true
+port    = ssh
+filter  = sshd
+logpath  = /var/log/auth.log

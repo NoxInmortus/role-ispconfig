@@ -1,0 +1,62 @@
+# {{ ansible_managed }}
+# Those aliases do not work properly with several hosts on your apache server
+# Uncomment them to use it or adapt them to your configuration
+#    Alias /roundcube /var/lib/roundcube
+
+Alias /webmail /var/lib/roundcube
+
+<Directory /var/lib/roundcube/>
+  Options +FollowSymLinks
+  # This is needed to parse /var/lib/roundcube/.htaccess. See its
+  # content before setting AllowOverride to None.
+  AllowOverride All
+  <IfVersion >= 2.3>
+{% if security_whitelist is defined %}
+{% for ip in security_whitelist %}
+    Require ip {{ ip }}
+{% endfor %}
+{% endif %}
+    Require ip 127.0.0.1
+    Require all denied
+  </IfVersion>
+  <IfVersion < 2.3>
+    Order allow,deny
+{% if security_whitelist is defined %}
+{% for ip in security_whitelist %}
+    Allow from {{ ip }}
+{% endfor %}
+{% endif %}
+    Allow from 127.0.0.1
+    Deny from all
+  </IfVersion>
+</Directory>
+
+# Protecting basic directories:
+<Directory /var/lib/roundcube/config>
+        Options -FollowSymLinks
+        AllowOverride None
+</Directory>
+
+<Directory /var/lib/roundcube/temp>
+        Options -FollowSymLinks
+        AllowOverride None
+        <IfVersion >= 2.3>
+          Require all denied
+        </IfVersion>
+        <IfVersion < 2.3>
+          Order allow,deny
+          Deny from all
+        </IfVersion>
+</Directory>
+
+<Directory /var/lib/roundcube/logs>
+        Options -FollowSymLinks
+        AllowOverride None
+        <IfVersion >= 2.3>
+          Require all denied
+        </IfVersion>
+        <IfVersion < 2.3>
+          Order allow,deny
+          Deny from all
+        </IfVersion>
+</Directory>

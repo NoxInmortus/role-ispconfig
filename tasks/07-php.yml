@@ -1,0 +1,96 @@
+---
+########################
+## PHP 7.2 Repository ## https://ayesh.me/Ubuntu-PHP-7.2
+########################
+
+- name: "PHP 7.2 | Download repository key"
+  get_url:
+    url: https://packages.sury.org/php/apt.gpg
+    dest: /etc/apt/trusted.gpg.d/php.gpg
+  when: install_php7_2
+
+- name: "PHP 7.2 | Add repository"
+  apt_repository:
+    repo: "{{ item }}"
+  with_items:
+    - deb https://packages.sury.org/php/ stretch main
+  when: install_php7_2
+
+###########################
+## Packages installation ##
+###########################
+
+- name: "PHP | apt-get update"
+  apt:
+    update_cache: yes
+
+- name: "PHP 7.0 | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ php7_0_packages }}"
+
+- name: "PHP 7.1 | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ php7_1_packages }}"
+  when:
+    - install_php7_1
+
+- name: "PHP 7.2 | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ php7_2_packages }}"
+  when:
+    - install_php7_2
+    - not ansible_check_mode
+
+- name: "PHP | Install other packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ php_other_packages }}"
+
+#####################
+## PHP 7.2 mycrypt ## https://gist.github.com/arzzen/1209aa4a430bd95db3090a3399e6c35f
+#####################
+
+- name: "PHP 7.2 | Ensure /etc/php/7.2/apache2/conf.d exist"
+  file:
+    path: /etc/php/7.2/apache2/conf.d
+    state: directory
+    owner: root
+    group: root
+  when: install_php7_2
+
+# Check if mycrypt has already been installed
+- name: "PHP 7.2 | Check /etc/facts.conf for php_7_2_mycrypt=yes"
+  lineinfile:
+    path: /etc/facts.conf
+    line: "php_7_2_mycrypt=yes"
+  check_mode: yes
+  register: facts_php_7_2_mycrypt
+  failed_when: (facts_php_7_2_mycrypt is changed) or (facts_php_7_2_mycrypt is failed)
+  ignore_errors: True
+  when: install_php7_2
+
+  # Install through pear module was not working very well...
+- name: "PHP 7.2 | Install & configure php7.2-mycrypt"
+  shell: "{{ item }}"
+  with_items:
+    - 'echo "" | pecl install mcrypt-1.0.1'
+    - 'bash -c "echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/cli/conf.d/mcrypt.ini"'
+    - 'bash -c "echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/apache2/conf.d/mcrypt.ini"'
+  when:
+    - install_php7_2
+    - facts_php_7_2_mycrypt is failed
+
+- name: "PHP 7.2 | Add php_7_2_mycrypt=yes to /etc/facts.conf"
+  lineinfile:
+    path: /etc/facts.conf
+    line: 'php_7_2_mycrypt=yes'
+  when:
+    - install_php7_2
+    - facts_php_7_2_mycrypt is failed
