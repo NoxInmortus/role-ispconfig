@@ -9,10 +9,10 @@
 # Description: Update ispserver.pem automatically after ISPC LE SSL certs are renewed.
 ### END INIT INFO
 cd /usr/local/ispconfig/interface/ssl/
-mv ispserver.pem ispserver.pem-$(date +"%y%m%d%H%M%S").bak
+mv ispserver.pem ispserver.pem-$(date +"%y%m%d%H").bak
 cat ispserver.{key,crt} > ispserver.pem
-chmod 600 ispserver.pem
-chmod 600 /etc/ssl/private/pure-ftpd.pem
+chmod 400 ispserver.pem
+chmod 400 /etc/ssl/private/pure-ftpd.pem
 service pure-ftpd-mysql restart
 service postfix restart
 service dovecot restart

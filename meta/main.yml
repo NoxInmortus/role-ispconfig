@@ -1,7 +1,7 @@
 galaxy_info:
   author:
     - Alban EG
-  min_ansible_version: 2.4
+  min_ansible_version: 2.5
   platforms:
     - name: Debian
       versions:

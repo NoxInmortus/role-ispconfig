@@ -1,0 +1,84 @@
+---
+############################
+## Pure-ftpd installation ##
+############################
+
+- name: "PureFTPd | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ pureftpd_packages }}"
+
+- name: "PureFTPd | Configure /etc/default/pure-ftpd-common"
+  template:
+    src: "05-pure-ftpd-common"
+    dest: /etc/default/pure-ftpd-common
+
+- name: "PureFTPd | Passive Ports configuration"
+  shell: echo "{{ pureftpd_passive_ports }}" > /etc/pure-ftpd/conf/PassivePortRange
+
+##################
+## PureFTPd TLS ##
+##################
+- name: "PureFTPd | TLS Activation"
+  shell: echo 1 > /etc/pure-ftpd/conf/TLS
+  when:
+    - not ansible_check_mode or '"pureftpd" in ansible_facts.packages'
+    - install_pureftpd_ssl
+    - ftp_ssl_country is defined
+
+- name: "PureFTPd | Create tls directory"
+  file:
+    path: /etc/ssl/private
+    state: directory
+  when:
+    - install_pureftpd_ssl
+
+## This is tricky
+## https://www.shellhacks.com/create-csr-openssl-without-prompt-non-interactive/
+- name: "PureFTPd | Openssl dhparam and certificate for pure-ftpd"
+  command: "{{ item }}"
+  with_items:
+    - 'openssl dhparam -out /etc/ssl/private/pure-ftpd-dhparams.pem 2048'
+    - 'openssl req -x509 -nodes -days 7300 -newkey rsa:2048 -keyout /etc/ssl/private/pure-ftpd.pem -out /etc/ssl/private/pure-ftpd.pem -subj "/C={{ ftp_ssl_country }}/ST={{ ftp_ssl_state}}/L={{ ftp_ssl_locality }}/O={{ ftp_ssl_organization }}/OU={{ ftp_ssl_ou }}/CN={{ hostname_fqdn }}"'
+  when:
+    - install_pureftpd_ssl
+    - ftp_ssl_country is defined
+
+###########
+## Quota ## if this set of tasks fails without check mode, you may want to look into it.
+########### If it's check mode, this is normal.
+- name: "PureFTPd - Quota | Check /etc/fstab"
+  shell: grep -c usrjquota /etc/fstab
+  register: fstab_quota
+  failed_when: "'FAILED' in fstab_quota.stderr"
+  when: pureftpd_quota_mount is defined
+
+- name: "PureFTPd - Quota | Remounting partition"
+  mount:
+    path: /
+    src: {{ pureftpd_quota_mount }}
+    fstype: ext4
+    state: mounted
+    opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
+    passno: 1
+  ignore_errors: yes
+  when:
+    - not ansible_check_mode or fstab_quota.stdout == "0"
+    - pureftpd_quota_mount is defined
+
+- name: "PureFTPd - Quota | Quota Check"
+  command: quotacheck -avugm
+  ignore_errors: yes
+  when:
+    - fstab_quota.stdout == "0" and not ansible_check_mode
+    - pureftpd_quota_mount is defined
+
+- name: "PureFTPd - Quota | Quota On"
+  command: quotaon -avug
+  ignore_errors: yes
+  when:
+    - fstab_quota.stdout == "0" and not ansible_check_mode
+    - pureftpd_quota_mount is defined
+  notify:
+    - restart pureftpd

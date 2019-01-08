@@ -1,0 +1,46 @@
+---
+- name: "Packages | Debconf for roundcube"
+  debconf:
+    name: roundcube
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'roundcube/dbconfig-install', value: 'true', vtype: 'boolean' }
+    - { question: 'roundcube/password-confirm', value: '', vtype: 'password' }
+    - { question: 'roundcube/mysql/admin-pass', value: '{{ mysql_root_password }}', vtype: 'password' }
+  when: not roundcube_already_installed
+  no_log: true
+
+- name: "Roundcube | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - roundcube
+    - roundcube-core
+    - roundcube-mysql
+    - roundcube-plugins
+
+- name: "Roundcube | Generate random password for des_key"
+  set_fact:
+    roundcube_des_key_password: "{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits,hexdigits,punctuation') }}"
+  no_log: true
+  when: not roundcube_already_installed
+
+- name: "Roundcube | Configure roundcube /etc/roundcube/config.inc.php"
+  template:
+    src: 11-roundcube.config.inc.php.j2
+    dest: /etc/roundcube/config.inc.php
+  when:
+    - not ansible_check_mode or '"roundcube" in ansible_facts.packages'
+    - not roundcube_already_installed
+  no_log: true
+
+- name: "Roundcube | Configure /etc/apache2/conf-available/roundcube.conf"
+  template:
+    src: 11-roundcube.apache.conf.j2
+    dest: /etc/apache2/conf-available/roundcube.conf
+  when:
+    - not ansible_check_mode or '"roundcube" in ansible_facts.packages'
+  notify:
+    - restart apache2

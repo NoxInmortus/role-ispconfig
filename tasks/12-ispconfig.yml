@@ -1,0 +1,28 @@
+---
+#########################
+## ISPConfig installer ##
+#########################
+
+- name: "ISPConfig-Installer | Download"
+  get_url:
+    url: http://www.ispconfig.org/downloads/ISPConfig-3-stable.tar.gz
+    dest: /tmp/ISPConfig-3-stable.tar.gz
+
+- name: "ISPConfig-Installer | Unarchive"
+  unarchive:
+    src: /tmp/ISPConfig-3-stable.tar.gz
+    dest: /tmp/
+    remote_src: yes
+  when: not ansible_check_mode
+
+- name: "ISPConfig-Installer | Get ispconfig_update.sh script in /usr/local/sbin"
+  copy:
+    src: /tmp/ispconfig3_install/server/scripts/{{ item }}
+    dest: /usr/local/sbin/{{ item }}
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0750
+  with_items:
+    - ispconfig_update.sh
+  when: not ansible_check_mode

@@ -1,0 +1,27 @@
+---
+########################################
+## Jailkit install through repository ## https://www.virtualmin.com/node/53969
+########################################
+
+- name: "Jailkit | Get repository key"
+  apt_key:
+    url: http://software2.virtualmin.com/lib/RPM-GPG-KEY-virtualmin-6
+
+- name: "Jailkit | Add repository"
+  apt_repository:
+    repo: "{{ item }}"
+    filename: "jailkit"
+  with_items:
+    - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-xenial main
+    - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-universal main
+
+- name: "Jailkit | apt-get update"
+  apt:
+    update_cache: yes
+
+- name: "Jailkit | Install package"
+  apt:
+    name: "{{ item }}"
+  when: not ansible_check_mode
+  with_items:
+    - jailkit

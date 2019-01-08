@@ -1,0 +1,72 @@
+---
+##########################
+## Postfix installation ##
+##########################
+
+- name: "Postfix | Debconf for Postfix"
+  debconf:
+    name: postfix
+    question: "{{ item.question }}"
+    value: "{{ item.value }}"
+    vtype: "{{ item.vtype }}"
+  with_items:
+    - { question: 'postfix/main_mailer_type', value: 'Internet Site', vtype: 'string' }
+    - { question: 'postfix/mailname', value: '{{ hostname_fqdn }}', vtype: 'string' }
+
+- name: "Postfix | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ postfix_packages }}"
+
+- name: "Postfix | Install mail security packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ mail_security_packages }}"
+  when: install_mail_security
+
+- name: "Postfix | Ensure /var/run/amavis/amavisd.lock is owned by amavis"
+  file:
+    path: /var/run/amavis/amavisd.lock
+    state: file
+    owner: amavis
+    group: amavis
+  when: install_mail_security
+
+- name: "Postfix | Configure /etc/amavis/conf.d/15-av_scanners"
+  template:
+    src: 03-postfix.amavis.avscanner.conf
+    dest: /etc/amavis/conf.d/15-av_scanners
+    mode: 0444
+    owner: root
+    group: root
+  when: install_mail_security
+
+- name: "Postfix | Disable spamassassin (managed by ISPconfig)"
+  service:
+    name: spamassassin
+    state: stopped
+    enabled: no
+  when: install_mail_security
+
+- name: "Postfix | Configure /etc/mailname"
+  template:
+    src: "03-postfix.{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    mode: 0444
+  with_items:
+    - mailname
+
+- name: "Postfix | Configure postfix main configs files"
+  template:
+    src: "03-postfix.{{ item }}"
+    dest: "/etc/postfix/{{ item }}"
+    mode: 0444
+  with_items:
+    - main.cf
+    - master.cf
+    - transport_slow
+  notify:
+    - restart amavis
+    - restart postfix

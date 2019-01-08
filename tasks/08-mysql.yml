@@ -1,0 +1,67 @@
+---
+#########################
+## MySQL Configuration ##
+#########################
+
+- name: "MySQL | Generate random password for root"
+  set_fact:
+    mysql_root_password: "{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits') }}"
+  when:
+    - mysql_root_password is not defined
+    - not mysql_already_installed
+  no_log: true
+
+- name: "MySQL | Create /root/.my.cnf"
+  template:
+    src: 08-mysql.root.my.cnf.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0400
+  when: not mysql_already_installed
+  no_log: true
+
+- name: "MySQL | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ mysql_packages }}"
+
+- name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf"
+  template:
+    src: 08-mysql.50-server.cnf
+    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+  when: not ansible_check_mode
+
+- name: "MySQL | Configure /etc/mysql/debian.cnf"
+  template:
+    src: 08-mysql.debian.cnf
+    dest: /etc/mysql/debian.cnf
+  when:
+    - not mysql_already_installed
+    - not ansible_check_mode
+  no_log: true
+
+- name: "MySQL | Configure /etc/security/limits.conf"
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "{{ item }}"
+  with_items:
+    - mysql soft nofile 65535
+    - mysql hard nofile 65535
+
+- name: "MySQL | Create directory /etc/systemd/system/mysql.service.d"
+  file:
+    path: /etc/systemd/system/mysql.service.d
+    state: directory
+
+- name: "MySQL | Configure /etc/systemd/system/mysql.service.d/limits.conf"
+  template:
+    src: 08-mysql.limits.conf
+    dest: /etc/systemd/system/mysql.service.d/limits.conf
+  when: not ansible_check_mode
+
+- name: "Restarting Services | Reload Systemd"
+  systemd: daemon_reload=yes
+  notify:
+    - restart mysql

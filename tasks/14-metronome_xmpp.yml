@@ -1,0 +1,54 @@
+---
+###########################
+## Metronome XMPP Server ##
+###########################
+- name: "Metronome XMPP | Get repository key"
+  apt_key:
+    url: http://prosody.im/files/prosody-debian-packages.key
+
+- name: "Metronome XMP | Add repository"
+  apt_repository:
+    repo: "deb http://packages.prosody.im/debian stretch main"
+    filename: "metronome"
+
+- name: "Metronome XMP | apt-get update"
+  apt:
+    update_cache: yes
+
+- name: "Metronome XMP | Install packages"
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - "{{ metronome_packages }}"
+
+- name: "Metronome XMP | luarocks install lpc"
+  command: luarocks install lpc
+
+- name: "Metronome XMP | add metronome user account"
+  user:
+    name: metronome
+    comment: Metronome
+    create_home: no
+    shell: /sbin/nologin
+
+- name: "Metronome XMP | Make sure /opt directory exist"
+  file:
+    path: /opt
+    state: directory
+
+- name: "Metronome XMP | Get Metronome repository"
+  git:
+    repo: 'https://github.com/maranda/metronome.git'
+    dest: /opt/metronome
+
+- name: "Metronome XMP | Configure "
+  command: "./configure --ostype=debian --prefix=/usr"
+  args:
+    chdir: "/opt/metronome"
+  register: metronome_configure
+
+- name: "Metronome XMP | Make & make install"
+  shell: make && make install
+  args:
+    chdir: "/opt/metronome"
+  when: metronome_configure is changed
