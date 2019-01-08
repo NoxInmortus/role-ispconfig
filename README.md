@@ -89,7 +89,7 @@ For a full installation, you will want to set every `instal_xxx` variables to tr
 | admin_email_mailman_password    | STRING | no       | none    | Required for mailman. A random password will be generated if admin_email is defined and install_mailman is true. |
 | security_whitelist              | LIST   | no       | none    | IPs to whitelist for fail2ban, postfix, roundcube and phpmyadmin. |
 | pureftpd_passive_ports          | STRING | no       | '47000 47100' | Passive ports for pureftpd. |
-| pureftpd_quota_mount is defined | STRING | no       | none    | mount-point path for pure-ftpd quota configuration. Example : `/dev/mapper/Debian9--Template--vg-root` |
+| pureftpd_quota_mount            | STRING | no       | none    | mount-point path for pure-ftpd quota configuration. Example : `/dev/mapper/Debian9--Template--vg-root` |
 | postfix_relayhost               | STRING | no       | none    | Configure a relayhost for postfix. |
 
 | VARIABLE                 | TYPE   | REQUIRED | DEFAULT | DESCRIPTION                     |
