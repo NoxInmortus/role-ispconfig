@@ -41,8 +41,9 @@ If you want to update your ispconfig installation, run `php -q update.php` inste
 
 Security Enforcement :
 - /etc/fail2ban/jail.local
-- /etc/apache2/conf-available/roundcube.conf
-- /etc/apache2/conf-available/phpmyadmin.conf
+- /etc/apache2/conf-enabled/roundcube.conf
+- /etc/apache2/conf-enabled/phpmyadmin.conf
+- /etc/apache2/conf-enabled/security.conf
 
 - Access Roundcube interface : `https://<hostname_fqdn>/webmail`
 - Access PhpMyAdmin interface : `https://<hostname_fqdn>/databases` (every scriptkiddy is looking for /phpmyadmin or something close).
