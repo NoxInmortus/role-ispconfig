@@ -78,7 +78,7 @@ There is a lot of variables (list) used to manage packages and other stuff, feel
 
 The install process is quite clear and commented, all tasks have explicit name, you won't be lost if you want to understand how the whole stuff works.
 
-For a full installation, you will want to set every `instal_xxx` variables to true. But you may not want to install everything.
+For a full installation, you will want to set every `install_xxx` variables to true. But you may not want to install everything.
 
 ### Variables
 
