@@ -81,11 +81,22 @@
   shell: "{{ item }}"
   with_items:
     - 'echo "" | pecl install mcrypt-1.0.1'
-    - 'bash -c "echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/cli/conf.d/mcrypt.ini"'
-    - 'bash -c "echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/apache2/conf.d/mcrypt.ini"'
+    - 'echo extension=/usr/lib/php/20170718/mcrypt.so > /etc/php/7.2/mods-available/mcrypt.ini'
   when:
     - install_php7_2
     - facts_php_7_2_mycrypt is failed
+
+- name: enable php7.2-mcrypt
+  file:
+    src: /etc/php/7.2/mods-available/mcrypt.ini
+    dest: /etc/php/7.2/{{ item }}/conf.d/20-mcrypt.ini
+    owner: root
+    group: root
+    state: link
+  with_items:
+    - fpm
+    - cli
+    - apache2
 
 - name: "PHP 7.2 | Add php_7_2_mycrypt=yes to /etc/facts.conf"
   lineinfile:
