@@ -69,7 +69,8 @@
   pear:
     name: pecl/mcrypt-1.0.1
     state: present
-
+  when: install_php7_2
+  
 - block:
     - file:
         path: /etc/php/7.2/mods-available/mcrypt.ini
@@ -78,7 +79,8 @@
         line: "extension=/usr/lib/php/20170718/mcrypt.so"
         path: /etc/php/7.2/mods-available/mcrypt.ini
         state: present
-
+  when: install_php7_2
+  
 - name: enable php7.2-mcrypt
   file:
     src: /etc/php/7.2/mods-available/mcrypt.ini
@@ -86,6 +88,7 @@
     owner: root
     group: root
     state: link
+  when: install_php7_2
   with_items:
     - fpm
     - cli
