@@ -21,7 +21,9 @@
 - name: "ISPConfig-SSL | Backup old ispconfig certificate"
   shell: mv {{ item }}/ispserver.crt {{ item }}/ispserver.crt-$(date +"%y%m%d%H").bak && mv {{ item }}/ispserver.key {{ item }}/ispserver.key-$(date +"%y%m%d%H").bak
   with_items: /usr/local/ispconfig/interface/ssl
-  when: original_cert_ispserver.stat.exists
+  when:
+    - original_cert_ispserver.stat.exists
+    - not original_cert_ispserver.stat.islnk
 
 - name: "ISPConfig-SSL | Backup old postfix certificate"
   shell: mv {{ item }}/smtpd.cert {{ item }}/smtpd.cert-$(date +"%y%m%d%H").bak && mv {{ item }}/smtpd.key {{ item }}/smtpd.key-$(date +"%y%m%d%H").bak
@@ -29,6 +31,7 @@
   when:
     - install_postfix
     - original_cert_postfix.stat.exists
+    - not original_cert_postfix.stat.islnk
 
 - name: "ISPConfig-SSL | Backup old pureftpd certificate"
   shell: mv {{ item }} {{ item }}-$(date +"%y%m%d%H").bak
@@ -37,6 +40,7 @@
     - not ansible_check_mode
     - install_pureftpd_ssl
     - original_cert_pureftpd.stat.exists
+    - not original_cert_pureftpd.stat.islnk
 
 ######################################
 ## Symlinks to replace certificates ##
