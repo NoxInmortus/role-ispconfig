@@ -10,7 +10,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^127.0.[1|0].1"
-    line: "127.0.0.1 {{ inventory_hostname }} {{ hostname_fqdn }}"
+    line: "127.0.0.1 {{ hostname_fqdn }} {{ inventory_hostname }}"
     backup: yes
 
 ##########
