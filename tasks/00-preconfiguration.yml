@@ -82,6 +82,11 @@
   when:
     - install_security_packages
 
+- name: "Remove /etc/fail2ban/jail.d/defaults-debian.conf"
+  file:
+    path: /etc/fail2ban/jail.d/defaults-debian.conf
+    state: absent
+
 - name: "Pre-configuration | Configure fail2ban /etc/fail2ban/jail.local"
   template:
     src: 00-f2b.jail.local.j2
