@@ -1,0 +1,85 @@
+# {{ ansible_managed }}
+#
+# The MySQL database server configuration file.
+#
+
+[client]
+port                           = 3306
+socket                         = /var/run/mysqld/mysqld.sock
+
+[mysqld_safe]
+socket                         = /var/run/mysqld/mysqld.sock
+nice                           = 0
+
+[mysqld]
+user                           = mysql
+pid-file                       = /var/run/mysqld/mysqld.pid
+socket                         = /var/run/mysqld/mysqld.sock
+bind-address                   = 127.0.0.1
+port                           = 3306
+basedir                        = /usr
+datadir                        = /var/lib/mysql
+tmpdir                         = /tmp
+lc-messages-dir                = /usr/share/mysql
+sql_mode                       = NO_ENGINE_SUBSTITUTION,STRICT_ALL_TABLES
+symbolic-links                 = 0
+ignore_db_dir                 = lost+found
+skip-external-locking
+skip-name-resolve
+
+# Tuning
+max_allowed_packet             = 16M
+thread_stack                   = 192K
+thread_cache_size              = 8
+
+# MyISAM
+key_buffer_size                = 16M
+myisam_recover_options         = BACKUP
+
+# Query Cache Configuration
+query_cache_limit       = 1M
+query_cache_size        = 16M
+
+# Logging
+log_warnings                   = 2
+general_log_file               = /var/log/mysql/mysql.log
+general_log                    = OFF
+slow_query_log                 = 'OFF'
+slow_query_log_file            = /var/log/mysql/mysql-slow.log
+long_query_time                = 20
+log_slow_rate_limit            = 1000
+expire_logs_days               = 10
+max_binlog_size                = 100M
+
+## InnoDB tuning
+innodb_file_per_table          = 1
+innodb_buffer_pool_size        = 256M
+innodb_buffer_pool_instances   = 1
+innodb_log_file_size           = 128M
+innodb_log_buffer_size         = 8M
+innodb_thread_concurrency      = 8
+innodb_read_io_threads         = 4
+innodb_write_io_threads        = 4
+innodb_open_files              = 400
+innodb_io_capacity             = 600
+innodb_lock_wait_timeout       = 60
+innodb_flush_method            = O_DIRECT
+innodb_doublewrite             = 0
+innodb_use_native_aio          = 1
+innodb_flush_log_at_trx_commit = 0
+default_storage_engine         = InnoDB
+
+## Others
+sql-mode="NO_ENGINE_SUBSTITUTION"
+character-set-server  = utf8mb4
+collation-server      = utf8mb4_general_ci
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet             = 32M
+
+[isamchk]
+key_buffer                     = 32M
+
+!includedir /etc/mysql/conf.d/

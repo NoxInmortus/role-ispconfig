@@ -27,19 +27,19 @@
   with_items:
     - "{{ mysql_packages }}"
 
-- name: "MySQL | Configure /etc/mysql/mariadb.conf.d/50-server.cnf"
+- name: "MySQL | Configure /etc/mysql/my.cnf"
   template:
-    src: 08-mysql.50-server.cnf
-    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-  when: not ansible_check_mode
+    src: 08-mysql.my.cnf
+    dest: /etc/mysql/my.cnf
+    mode: 0444
+  notify: restart mysql
 
 - name: "MySQL | Configure /etc/mysql/debian.cnf"
   template:
     src: 08-mysql.debian.cnf
     dest: /etc/mysql/debian.cnf
-  when:
-    - not mysql_already_installed
-    - not ansible_check_mode
+    mode: 0400
+  when: not mysql_already_installed
   no_log: true
 
 - name: "MySQL | Configure /etc/security/limits.conf"
@@ -49,6 +49,7 @@
   with_items:
     - mysql soft nofile 65535
     - mysql hard nofile 65535
+  notify: restart mysql
 
 - name: "MySQL | Create directory /etc/systemd/system/mysql.service.d"
   file:
@@ -59,9 +60,8 @@
   template:
     src: 08-mysql.limits.conf
     dest: /etc/systemd/system/mysql.service.d/limits.conf
-  when: not ansible_check_mode
+  notify: restart mysql
 
 - name: "Restarting Services | Reload Systemd"
   systemd: daemon_reload=yes
-  notify:
-    - restart mysql
+  notify: restart mysql

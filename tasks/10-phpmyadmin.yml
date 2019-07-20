@@ -13,15 +13,11 @@
 
 - name: "PhpMyAdmin | Install packages"
   apt:
-    name: "{{ item }}"
-  with_items:
-    - phpmyadmin
+    name: "phpmyadmin"
 
 - name: "PhpMyAdmin | Configure /etc/apache2/conf-available/phpmyadmin.conf"
   template:
     src: 10-phpmyadmin.apache.conf.j2
     dest: /etc/apache2/conf-available/phpmyadmin.conf
-  when:
-    - not ansible_check_mode
-  notify:
-    - restart apache2
+  when: not ansible_check_mode or '"phpmyadmin" in ansible_facts.packages'
+  notify: restart apache2

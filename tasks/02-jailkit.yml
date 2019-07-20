@@ -11,6 +11,7 @@
   apt_repository:
     repo: "{{ item }}"
     filename: "jailkit"
+  register: jailkit_repo
   with_items:
     - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-xenial main
     - deb http://software.virtualmin.com/vm/6/gpl/apt virtualmin-universal main
@@ -21,7 +22,5 @@
 
 - name: "Jailkit | Install package"
   apt:
-    name: "{{ item }}"
-  when: not ansible_check_mode
-  with_items:
-    - jailkit
+    name: "jailkit"
+  when: jailkit_repo.changed

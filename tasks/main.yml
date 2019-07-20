@@ -1,4 +1,9 @@
 ---
+
+- name: "ISPConfig | Gathering package facts"
+  package_facts:
+    manager: apt
+
 #############################
 ## Pre-configuration tasks ##
 #############################
@@ -138,6 +143,7 @@
 - name: "ISPConfig Installer | Check if folder already exist"
   stat:
     path: /tmp/ispconfig3_install
+    get_checksum: no
   register: isp_install_dir
   when: install_ispconfig
   tags: ispconfig_installer

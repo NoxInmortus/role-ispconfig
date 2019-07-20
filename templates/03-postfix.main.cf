@@ -14,7 +14,8 @@ biff = no
 append_dot_mydomain = no
 readme_directory = no
 
-relayhost =
+relayhost = {% if postfix_relayhost is defined %}{{ postfix_relayhost }}{% endif %}
+
 smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination
 recipient_delimiter = +
 mailbox_size_limit = 0
@@ -80,13 +81,13 @@ virtual_mailbox_base = /var/vmail
 virtual_uid_maps = mysql:/etc/postfix/mysql-virtual_uids.cf
 virtual_gid_maps = mysql:/etc/postfix/mysql-virtual_gids.cf
 
-alias_maps = hash:/etc/aliases {% if install_mailman %},hash:/var/lib/mailman/data/aliases{% endif %}
+alias_maps = hash:/etc/aliases{% if install_mailman %}, hash:/var/lib/mailman/data/aliases{% endif %}
 
-alias_database = hash:/etc/aliases {% if install_mailman %},hash:/var/lib/mailman/data/aliases{% endif %}
+alias_database = hash:/etc/aliases{% if install_mailman %}, hash:/var/lib/mailman/data/aliases{% endif %}
 
 {% if install_mail_security %}
 # Amavis
-content_filter=amavis:[127.0.0.1]:10024
+content_filter = amavis:[127.0.0.1]:10024
 {% endif %}
 
 # Miscallenious

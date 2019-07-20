@@ -14,3 +14,13 @@
     dest: /tmp/
     remote_src: yes
   when: not ansible_check_mode
+
+- name: "ISPConfig-Installer | Get ispconfig_update.sh script in /usr/local/sbin"
+  copy:
+    src: /tmp/ispconfig3_install/server/scripts/ispconfig_update.sh
+    dest: /usr/local/sbin/ispconfig_update.sh
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0750
+  when: not ansible_check_mode

@@ -5,7 +5,7 @@ ServerSignature Off
 
 TraceEnable Off
 
-ServerName cmaprdlamp1.nexen.net
+ServerName {{ hostname_fqdn }}
 ServerRoot /etc/apache2
 PidFile ${APACHE_PID_FILE}
 Timeout 300
@@ -19,13 +19,13 @@ Group www-data
 
 AccessFileName .htaccess
 <FilesMatch "^\.ht">
-Require all denied
+  Require all denied
 </FilesMatch>
 
 <Directory />
-     Options FollowSymLinks
-     AllowOverride None
-Require all denied
+  Options FollowSymLinks
+  AllowOverride None
+  Require all denied
 </Directory>
 
 HostnameLookups Off
@@ -37,7 +37,7 @@ Include "/etc/apache2/mods-enabled/*.conf"
 Include "/etc/apache2/ports.conf"
 
 LogFormat "%{X-Forwarded-For}i %h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %b %D %T %P %V:%p" syslog
-CustomLog "|/bin/sh -c 'logger -p local7.info -t apache_access_log'" syslog
+CustomLog "|/bin/sh -c 'logger -p local7.info -t apache_access_log'" syslog env=!dontlog
 ErrorLog  "|/bin/sh -c 'logger -p local7.err -t apache_error_log'"
 
 IncludeOptional "/etc/apache2/conf.d/*.conf"

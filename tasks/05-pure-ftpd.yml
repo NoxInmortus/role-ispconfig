@@ -23,7 +23,7 @@
 - name: "PureFTPd | TLS Activation"
   shell: echo 1 > /etc/pure-ftpd/conf/TLS
   when:
-    - not ansible_check_mode
+    - not ansible_check_mode or '"pureftpd" in ansible_facts.packages'
     - install_pureftpd_ssl
     - ftp_ssl_country is defined
 
@@ -31,8 +31,7 @@
   file:
     path: /etc/ssl/private
     state: directory
-  when:
-    - install_pureftpd_ssl
+  when: install_pureftpd_ssl
 
 ## This is tricky
 ## https://www.shellhacks.com/create-csr-openssl-without-prompt-non-interactive/
@@ -52,26 +51,33 @@
   shell: grep -c usrjquota /etc/fstab
   register: fstab_quota
   failed_when: "'FAILED' in fstab_quota.stderr"
+  when: pureftpd_quota_mount is defined
 
 - name: "PureFTPd - Quota | Remounting partition"
   mount:
     path: /
-    src: /dev/mapper/Debian9--Template--vg-root
+    src: "{{ pureftpd_quota_mount }}"
     fstype: ext4
     state: mounted
     opts: errors=remount-ro,usrjquota=quota.user,grpjquota=quota.group,jqfmt=vfsv0
     passno: 1
   ignore_errors: yes
-  when: not ansible_check_mode or fstab_quota.stdout == "0"
+  when:
+    - not ansible_check_mode or fstab_quota.stdout == "0"
+    - pureftpd_quota_mount is defined
 
 - name: "PureFTPd - Quota | Quota Check"
   command: quotacheck -avugm
   ignore_errors: yes
-  when: fstab_quota.stdout == "0" and not ansible_check_mode
+  when:
+    - fstab_quota.stdout == "0" and not ansible_check_mode
+    - pureftpd_quota_mount is defined
 
 - name: "PureFTPd - Quota | Quota On"
   command: quotaon -avug
   ignore_errors: yes
-  when: fstab_quota.stdout == "0" and not ansible_check_mode
+  when:
+    - fstab_quota.stdout == "0" and not ansible_check_mode
+    - pureftpd_quota_mount is defined
   notify:
     - restart pureftpd

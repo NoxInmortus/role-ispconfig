@@ -37,10 +37,13 @@ Once everything is installed, generate a let's encrypt certificate for your `hos
 You can get the `mysql_root_password` if automatically generated in `/root/.my.cnf`
 Then start the role again with `ispconfig_ssl` tag to use the let's encrypt certificate.
 
+If you want to update your ispconfig installation, run `php -q update.php` instead of `php -q install.php`.
+
 Security Enforcement :
 - /etc/fail2ban/jail.local
-- /etc/apache2/conf-available/roundcube.conf
-- /etc/apache2/conf-available/phpmyadmin.conf
+- /etc/apache2/conf-enabled/roundcube.conf
+- /etc/apache2/conf-enabled/phpmyadmin.conf
+- /etc/apache2/conf-enabled/security.conf
 
 - Access Roundcube interface : `https://<hostname_fqdn>/webmail`
 - Access PhpMyAdmin interface : `https://<hostname_fqdn>/databases` (every scriptkiddy is looking for /phpmyadmin or something close).
@@ -53,7 +56,7 @@ This role is hudge, it install a lot of stuff (and it does not install clamav by
 
 ## Requirement
 
-- Ansible 2.2
+- Ansible 2.5
 - OS : Debian Stretch
 
 ## Minimal Quickstart
@@ -75,18 +78,20 @@ There is a lot of variables (list) used to manage packages and other stuff, feel
 
 The install process is quite clear and commented, all tasks have explicit name, you won't be lost if you want to understand how the whole stuff works.
 
-For a full installation, you will want to set every `instal_xxx` variables to true. But you may not want to install everything.
+For a full installation, you will want to set every `install_xxx` variables to true. But you may not want to install everything.
 
 ### Variables
 
-| VARIABLE                     | TYPE   | REQUIRED | DEFAULT | DESCRIPTION          |
-|------------------------------|--------|----------|---------|----------------------|
-| hostname_fqdn                | STRING | yes      | none    | FQDN for the system. |
-| mysql_root_password          | STRING | no       | none    | Mysql root password. A random password will be generated if not defined, but this is viable for a one-shot deployement, don't relaunch mysql tasks after that. |
-| admin_email                  | STRING | no       | none    | Required for mailman & used by rkhunter. |
-| admin_email_mailman_password | STRING | no       | none    | Required for mailman. A random password will be generated if admin_email is defined and install_mailman is true. |
-| security_whitelist           | LIST   | no       | none    | IPs to whitelist for fail2ban, postfix, roundcube and phpmyadmin |
-| pureftpd_passive_ports       | STRING | no       | '47000 47100' | Passive ports for pureftpd |
+| VARIABLE                        | TYPE   | REQUIRED | DEFAULT | DESCRIPTION          |
+|---------------------------------|--------|----------|---------|----------------------|
+| hostname_fqdn                   | STRING | yes      | none    | FQDN for the system. |
+| mysql_root_password             | STRING | no       | none    | Mysql root password. A random password will be generated if not defined, but this is viable for a one-shot deployement, don't relaunch mysql tasks after that. |
+| admin_email                     | STRING | no       | none    | Required for mailman & used by rkhunter. |
+| admin_email_mailman_password    | STRING | no       | none    | Required for mailman. A random password will be generated if admin_email is defined and install_mailman is true. |
+| security_whitelist              | LIST   | no       | none    | IPs to whitelist for fail2ban, postfix, roundcube and phpmyadmin. |
+| pureftpd_passive_ports          | STRING | no       | '47000 47100' | Passive ports for pureftpd. |
+| pureftpd_quota_mount            | STRING | no       | none    | mount-point path for pure-ftpd quota configuration. Example : `/dev/mapper/Debian9--Template--vg-root` |
+| postfix_relayhost               | STRING | no       | none    | Configure a relayhost for postfix. |
 
 | VARIABLE                 | TYPE   | REQUIRED | DEFAULT | DESCRIPTION                     |
 |--------------------------|--------|----------|---------|---------------------------------|
@@ -101,7 +106,9 @@ For a full installation, you will want to set every `instal_xxx` variables to tr
 | install_pureftpd_ssl     | BOOL   | no       | false   | Configure SSL for pureftpd. Require ftp variables. Notice that ssl certificate will be overwrited if ispconfig_ssl tasks are deployed. |
 | install_apache2          | BOOL   | no       | false   | Install & configure apache2 |
 | install_php              | BOOL   | no       | false   | Install php7.0 |
-| install_php7_2           | BOOL   | no       | false   | Install php7.2 (will have php7.0 + php7.2 as default version) |
+| install_php7_1           | BOOL   | no       | false   | Install php7.1 (will have php7.0 + php7.1 as default version) |
+| install_php7_2           | BOOL   | no       | false   | Install php7.2 (will have php7.0 (+ php7.x if enabled) + php7.2 as default version) |
+| install_php7_3           | BOOL   | no       | false   | Install php7.3 (will have php7.0 (+ php7.x if enabled) + php7.3 as default version) |
 | install_mysql            | BOOL   | no       | false   | Install & configure mysql |
 | install_mysql_secure     | BOOL   | no       | false   | Deploy mysql_secure_installation tasks |
 | install_phpmyadmin       | BOOL   | no       | false   | Install phpmyadmin |

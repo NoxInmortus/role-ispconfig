@@ -32,7 +32,7 @@
     src: 11-roundcube.config.inc.php.j2
     dest: /etc/roundcube/config.inc.php
   when:
-    - not ansible_check_mode
+    - not ansible_check_mode or '"roundcube" in ansible_facts.packages'
     - not roundcube_already_installed
   no_log: true
 
@@ -40,7 +40,5 @@
   template:
     src: 11-roundcube.apache.conf.j2
     dest: /etc/apache2/conf-available/roundcube.conf
-  when:
-    - not ansible_check_mode
-  notify:
-    - restart apache2
+  when: not ansible_check_mode or '"roundcube" in ansible_facts.packages'
+  notify: restart apache2

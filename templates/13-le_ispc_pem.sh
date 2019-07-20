@@ -11,8 +11,8 @@
 cd /usr/local/ispconfig/interface/ssl/
 mv ispserver.pem ispserver.pem-$(date +"%y%m%d%H").bak
 cat ispserver.{key,crt} > ispserver.pem
-chmod 400 ispserver.pem
-chmod 400 /etc/ssl/private/pure-ftpd.pem
+chmod 0400 ispserver.pem
+chmod 0400 /etc/ssl/private/pure-ftpd.pem
 service pure-ftpd-mysql restart
 service postfix restart
 service dovecot restart

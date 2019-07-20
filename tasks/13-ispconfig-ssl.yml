@@ -4,15 +4,15 @@
 #################################
 
 - name: "ISPConfig-SSL | Check if original certificates exists : ispserver"
-  stat: path=/usr/local/ispconfig/interface/ssl/ispserver.crt
+  stat: path=/usr/local/ispconfig/interface/ssl/ispserver.crt get_checksum=no
   register: original_cert_ispserver
 
 - name: "ISPConfig-SSL | Check if original certificates exists : postfix"
-  stat: path=/etc/postfix/smtpd.cert
+  stat: path=/etc/postfix/smtpd.cert get_checksum=no
   register: original_cert_postfix
 
 - name: "ISPConfig-SSL | Check if original certificates exists : pureftpd"
-  stat: path=/etc/ssl/private/pure-ftpd.pem
+  stat: path=/etc/ssl/private/pure-ftpd.pem get_checksum=no
   register: original_cert_pureftpd
 
 ######################
@@ -21,7 +21,9 @@
 - name: "ISPConfig-SSL | Backup old ispconfig certificate"
   shell: mv {{ item }}/ispserver.crt {{ item }}/ispserver.crt-$(date +"%y%m%d%H").bak && mv {{ item }}/ispserver.key {{ item }}/ispserver.key-$(date +"%y%m%d%H").bak
   with_items: /usr/local/ispconfig/interface/ssl
-  when: original_cert_ispserver.stat.exists
+  when:
+    - original_cert_ispserver.stat.exists
+    - not original_cert_ispserver.stat.islnk
 
 - name: "ISPConfig-SSL | Backup old postfix certificate"
   shell: mv {{ item }}/smtpd.cert {{ item }}/smtpd.cert-$(date +"%y%m%d%H").bak && mv {{ item }}/smtpd.key {{ item }}/smtpd.key-$(date +"%y%m%d%H").bak
@@ -29,6 +31,7 @@
   when:
     - install_postfix
     - original_cert_postfix.stat.exists
+    - not original_cert_postfix.stat.islnk
 
 - name: "ISPConfig-SSL | Backup old pureftpd certificate"
   shell: mv {{ item }} {{ item }}-$(date +"%y%m%d%H").bak
@@ -37,6 +40,7 @@
     - not ansible_check_mode
     - install_pureftpd_ssl
     - original_cert_pureftpd.stat.exists
+    - not original_cert_pureftpd.stat.islnk
 
 ######################################
 ## Symlinks to replace certificates ##
@@ -68,13 +72,10 @@
 ###############################
 - name: "ISPConfig-SSL | chmod 400 LE SSL"
   file:
-    path: "{{ item }}"
+    path: "/usr/local/ispconfig/interface/ssl/ispserver.pem"
     mode: 0400
-  with_items:
-    - /usr/local/ispconfig/interface/ssl/ispserver.pem
   when: not ansible_check_mode
-  notify:
-    - restart apache2
+  notify: restart apache2
 
 ######################################
 ## Symlinks to replace certificates ##
@@ -94,8 +95,7 @@
     dest: '/etc/postfix/smtpd.cert'
     state: link
   when: not ansible_check_mode
-  notify:
-    - restart postfix
+  notify: restart postfix
 
 ## Pure-ftpd
 - name: "ISPConfig-SSL | Put symlink of the LE SSL to pure-ftpd ssl location"
@@ -104,8 +104,7 @@
     dest: '/etc/ssl/private/pure-ftpd.pem'
     state: link
   when: not ansible_check_mode
-  notify:
-    - restart pureftpd
+  notify: restart pureftpd
 
 ###########################
 ## Setup SSL for dovecot ##
@@ -124,24 +123,19 @@
     regexp: 'ssl_key$'
     line: 'ssl_key = </etc/postfix/smtpd.key'
     backrefs: yes
-  notify:
-    - restart dovecot
+  notify: restart dovecot
 
 ########################################
 ## Incron job for certificate renewal ##
 ########################################
 - name: "ISPConfig-SSL | Set script /etc/init.d/le_ispc_pem.sh"
   template:
-    src:  "13-{{ item }}"
-    dest: "/etc/init.d/{{ item }}"
+    src:  "13-le_ispc_pem.sh"
+    dest: "/etc/init.d/le_ispc_pem.sh"
     mode: 0750
-  with_items:
-    - le_ispc_pem.sh
 
 - name: "ISPConfig-SSL | Set incron"
   template:
-    src:  "13-{{ item }}"
-    dest: "/etc/incron.d/{{ item }}"
+    src:  "13-incron"
+    dest: "/etc/incron.d/incron"
     mode: 0444
-  with_items:
-    - incron

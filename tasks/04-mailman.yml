@@ -15,16 +15,13 @@
 
 - name: "Mailman | Install package"
   apt:
-    name: "{{ item }}"
+    name: "mailman"
   register: mailman_package_install
-  with_items:
-    - mailman
 
 - name: "Mailman | Generate random password for admin_email"
   set_fact:
     admin_email_mailman_password: "{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits') }}"
-  when:
-    - admin_email_mailman_password is not defined
+  when: admin_email_mailman_password is not defined
   no_log: true
 
 - name: "Mailman | Configure new maillist"
@@ -34,17 +31,15 @@
 
 - name: "Mailman | Configure /etc/aliases"
   template:
-    src: "04-mailman.{{ item }}"
-    dest: "/etc/{{ item }}"
-  with_items:
-    - aliases
+    src: "04-mailman.aliases"
+    dest: "/etc/aliases"
 
 - name: "Mailman | Symlink"
   file:
     src: /etc/mailman/apache.conf
     dest: /etc/apache2/conf-enabled/mailman.conf
     state: link
-  when: not ansible_check_mode
+  when: install_apache2
 
 - name: "Mailman | Ensure /var/lib/mailman/aliases exist"
   file:

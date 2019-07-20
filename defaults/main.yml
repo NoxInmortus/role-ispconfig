@@ -8,6 +8,7 @@
 #mailman_password:
 #security_whitelist:
 pureftpd_passive_ports: '47000 47100'
+#pureftpd_quota_mount:
 
 #ftp_ssl_country:
 #ftp_ssl_state:
@@ -26,7 +27,9 @@ install_pureftpd: false
 install_pureftpd_ssl: false
 install_apache2: false
 install_php: false
+install_php7_1: false
 install_php7_2: false
+install_php7_3: false
 install_mysql: false
 install_mysql_secure: false
 install_phpmyadmin: false
@@ -128,7 +131,6 @@ apache2_modules:
   - alias
 
 apache2_disabled_conf:
-  - security
   - apache2-doc
   - charset
   - other-vhosts-access-log
@@ -137,6 +139,7 @@ apache2_disabled_conf:
 apache2_conf: # it breaks "Apache2 | Configure additional conf /etc/apache2/conf-available" task when used..
   - httpoxy
   - badbots
+  - security
 
 ##################
 ## PHP PACKAGES ##
@@ -164,6 +167,29 @@ php7_0_packages:
   - php7.0-fpm
   - php7.0-opcache
 
+php7_1_packages:
+  - php7.1
+  - php7.1-common
+  - php7.1-gd
+  - php7.1-mysql
+  - php7.1-imap
+  - php7.1-cli
+  - php7.1-cgi
+  - php7.1-mcrypt
+  - php7.1-curl
+  - php7.1-intl
+  - php7.1-pspell
+  - php7.1-recode
+  - php7.1-sqlite3
+  - php7.1-tidy
+  - php7.1-xmlrpc
+  - php7.1-xsl
+  - php7.1-zip
+  - php7.1-mbstring
+  - php7.1-soap
+  - php7.1-fpm
+  - php7.1-opcache
+
 php7_2_packages:
   - php7.2
   - php7.2-common
@@ -187,12 +213,36 @@ php7_2_packages:
   - php7.2-opcache
   - php7.2-dev
 
+php7_3_packages:
+  - php7.3
+  - php7.3-common
+  - php7.3-gd
+  - php7.3-mysql
+  - php7.3-imap
+  - php7.3-cli
+  - php7.3-cgi
+  - php7.3-curl
+  - php7.3-intl
+  - php7.3-pspell
+  - php7.3-recode
+  - php7.3-sqlite3
+  - php7.3-tidy
+  - php7.3-xmlrpc
+  - php7.3-xsl
+  - php7.3-zip
+  - php7.3-mbstring
+  - php7.3-soap
+  - php7.3-fpm
+  - php7.3-opcache
+  - php7.3-dev
+
 php_other_packages:
   - php-memcache
   - php-imagick
   - php-gettext
   - php-pear
   - php-apcu
+  - php-xml
 
 ####################
 ## MySQL packages ##

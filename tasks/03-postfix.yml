@@ -52,11 +52,9 @@
 
 - name: "Postfix | Configure /etc/mailname"
   template:
-    src: "03-postfix.{{ item }}.j2"
-    dest: "/etc/{{ item }}"
+    src: "03-postfix.mailname.j2"
+    dest: "/etc/mailname"
     mode: 0444
-  with_items:
-    - mailname
 
 - name: "Postfix | Configure postfix main configs files"
   template:

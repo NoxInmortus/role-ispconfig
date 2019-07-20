@@ -22,7 +22,7 @@
     src: "06-apache2.main.conf.j2"
     dest: "/etc/apache2/apache2.conf"
     mode: 0444
-  when: apache2_package_install.changed
+  when: apache2_package_install.changed or '"apache2" in ansible_facts.packages'
 
 - name: "Apache2 | Configure additional conf /etc/apache2/conf-available"
   template:
@@ -32,13 +32,18 @@
   with_items:
     - httpoxy.conf
     - badbots.conf
-  when: not ansible_check_mode
+    - security.conf
+  when: apache2_package_install.changed or '"apache2" in ansible_facts.packages'
+
+- name: "Apache2 | Disable default vhost"
+  command: "a2dissite 000-default.conf"
+  notify: restart apache2
 
 - name: "Apache2 | Enable Apache modules"
   apache2_module:
     name: "{{ item }}"
   with_items: "{{ apache2_modules }}"
-  when: not ansible_check_mode
+  when: apache2_package_install.changed or '"apache2" in ansible_facts.packages'
 
 - name: "Apache2 | Enable Apache additional configs files"
   command: "a2enconf {{ item }}"
@@ -47,5 +52,4 @@
 - name: "Apache2 | Disable Apache conf not needed anymore"
   command: "a2disconf {{ item }}"
   with_items: "{{ apache2_disabled_conf }}"
-  notify:
-    - restart apache2
+  notify: restart apache2
